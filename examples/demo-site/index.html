@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      try {
+        var s = localStorage.getItem('theme');
+        if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+      document.documentElement.classList.add('js');
+    </script>
+    <title>Kiln &amp; Bean — neighbourhood coffee and pottery, Mill Lane</title>
+    <meta name="description" content="Kiln & Bean is a small coffee bar and pottery studio on Mill Lane: espresso, filter, baked goods and Saturday wheel classes. Open seven days.">
+    <link rel="canonical" href="https://example.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Kiln & Bean — neighbourhood coffee and pottery">
+    <meta property="og:description" content="Espresso, filter, baked goods and Saturday wheel classes on Mill Lane. Open seven days.">
+    <meta property="og:image" content="https://example.com/og.png">
+    <meta property="og:url" content="https://example.com/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#f4ecdf" id="theme-color">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito+Sans:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CafeOrCoffeeShop",
+      "name": "Kiln & Bean",
+      "description": "Coffee bar and pottery studio on Mill Lane.",
+      "url": "https://example.com/",
+      "telephone": "+44 1234 567890",
+      "address": { "@type": "PostalAddress", "streetAddress": "14 Mill Lane", "addressLocality": "Oldbridge", "postalCode": "OB1 2PT", "addressCountry": "GB" },
+      "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:30", "closes": "17:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday","Sunday"], "opens": "08:30", "closes": "16:00" }
+      ],
+      "servesCuisine": "Coffee"
+    }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="brand" href="/" aria-label="Kiln & Bean home">
+          <svg class="brand__mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="var(--primary)"/><path d="M8 7h3.2v5.6L16.6 7h4L15 13.4 21 21h-4l-4.3-5.6-1.5 1.6V21H8z" fill="var(--primary-foreground)"/></svg>
+          <span>Kiln &amp; Bean</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+        <nav id="site-nav" class="site-nav" aria-label="Primary">
+          <ul>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#hours">Hours</a></li>
+            <li><a href="#visit">Visit</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><button class="theme-toggle" type="button" aria-pressed="false">Dark mode</button></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="container hero__inner">
+          <p class="eyebrow">Mill Lane, Oldbridge</p>
+          <h1>Good coffee, made slowly. Clay, made by you.</h1>
+          <p class="lede">A six-seat coffee bar at the front, a pottery wheel studio at the back. Come for the flat white, stay for a Saturday class, leave with a mug you threw yourself.</p>
+          <div class="hero__actions">
+            <a class="button button--primary" href="#menu">See the menu</a>
+            <a class="button button--secondary" href="#visit">Find us</a>
+          </div>
+          <dl class="facts">
+            <div><dt>Open today</dt><dd data-today-hours>07:30–17:00</dd></div>
+            <div><dt>Next wheel class</dt><dd>Saturday 10:00, 2 seats left</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="menu" class="section" aria-labelledby="menu-heading">
+        <div class="container">
+          <h2 id="menu-heading">Menu</h2>
+          <p class="section__intro">Beans from a roaster two streets over, milk from a dairy ten miles out. Oat milk is no extra charge.</p>
+          <div class="menu-grid">
+            <section class="menu-group reveal" aria-labelledby="menu-espresso">
+              <h3 id="menu-espresso">Espresso</h3>
+              <ul class="menu-list">
+                <li><span>Espresso</span><span class="price">£2.60</span></li>
+                <li><span>Flat white</span><span class="price">£3.40</span></li>
+                <li><span>Cortado</span><span class="price">£3.10</span></li>
+                <li><span>Cappuccino</span><span class="price">£3.40</span></li>
+                <li><span>Mocha <span class="tag">house chocolate</span></span><span class="price">£3.90</span></li>
+              </ul>
+            </section>
+            <section class="menu-group reveal" aria-labelledby="menu-filter">
+              <h3 id="menu-filter">Filter &amp; other</h3>
+              <ul class="menu-list">
+                <li><span>Batch brew</span><span class="price">£2.80</span></li>
+                <li><span>Pour-over <span class="tag">single origin</span></span><span class="price">£4.20</span></li>
+                <li><span>Loose-leaf tea</span><span class="price">£2.80</span></li>
+                <li><span>Hot chocolate</span><span class="price">£3.50</span></li>
+                <li><span>Kiln cold brew</span><span class="price">£3.80</span></li>
+              </ul>
+            </section>
+            <section class="menu-group reveal" aria-labelledby="menu-bakes">
+              <h3 id="menu-bakes">From the oven</h3>
+              <ul class="menu-list">
+                <li><span>Cardamom bun</span><span class="price">£3.20</span></li>
+                <li><span>Sourdough toast, salted butter, jam</span><span class="price">£4.00</span></li>
+                <li><span>Cheese &amp; chive scone</span><span class="price">£3.00</span></li>
+                <li><span>Brown butter cookie</span><span class="price">£2.50</span></li>
+                <li><span>Seasonal cake slice</span><span class="price">£3.80</span></li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="hours" class="section section--muted" aria-labelledby="hours-heading">
+        <div class="container two-col">
+          <div class="reveal">
+            <h2 id="hours-heading">Hours</h2>
+            <table class="hours">
+              <caption class="visually-hidden">Opening hours by day</caption>
+              <tbody>
+                <tr data-days="1-5"><th scope="row">Monday to Friday</th><td>07:30–17:00</td></tr>
+                <tr data-days="6-0"><th scope="row">Saturday and Sunday</th><td>08:30–16:00</td></tr>
+                <tr><th scope="row">Wheel classes</th><td>Saturday 10:00 and 13:00</td></tr>
+              </tbody>
+            </table>
+            <p class="note">Bank holidays run weekend hours. The studio closes 30 minutes before the bar.</p>
+          </div>
+          <div id="visit" class="reveal">
+            <h2>Visit</h2>
+            <address class="address">
+              14 Mill Lane<br>
+              Oldbridge OB1 2PT<br>
+              <a href="tel:+441234567890">01234 567890</a>
+            </address>
+            <p><a class="button button--secondary" href="https://www.openstreetmap.org/search?query=14%20Mill%20Lane%20Oldbridge" rel="noopener noreferrer" target="_blank">Open in maps<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+            <p class="note">Step-free from the street, one accessible toilet, dogs welcome at the front.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section" aria-labelledby="contact-heading">
+        <div class="container narrow">
+          <h2 id="contact-heading">Book a class or ask a question</h2>
+          <p class="section__intro">We answer within a working day. For same-day table questions, ring us.</p>
+          <p class="mock-banner" data-mock-banner hidden>Demo site: messages are not sent anywhere.</p>
+          <form class="contact-form reveal" novalidate>
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required aria-describedby="name-error">
+              <p class="field__error" id="name-error"></p>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-error">
+              <p class="field__error" id="email-error"></p>
+            </div>
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" required aria-describedby="message-error"></textarea>
+              <p class="field__error" id="message-error"></p>
+            </div>
+            <div class="form__actions">
+              <button class="button button--primary" type="submit">Send message</button>
+              <p class="form__status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <p>© <span data-year>2026</span> Kiln &amp; Bean. 14 Mill Lane, Oldbridge.</p>
+        <p><a href="mailto:hello@example.com">hello@example.com</a></p>
+      </div>
+    </footer>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "kiln-and-bean",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static site for a coffee bar and pottery studio, built with the create-frontend skill (Terracotta theme).",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0"
+  }
+}

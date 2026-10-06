@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.2.0 — 2026-10-06
+
+Motion ships like colour does.
+
+### Added
+- `references/motion.md`: motion tokens (durations, easings, spring, travel distance, all collapsed under `prefers-reduced-motion`), three motion levels (`minimal`, `functional`, `expressive`) chosen by project type and theme, twelve paste-ready recipes (hover and press, menu/dialog/popover open-close with `@starting-style`, reveal once on scroll with a scroll-driven-animation path and an IntersectionObserver fallback, staggered entrance, accordion via `grid-template-rows`, tab indicator, skeleton, toast, theme cross-fade, page and view transitions, scroll-driven hero, count-up), and a table of when `motion`, GSAP or dotLottie are justified
+- Step 7 Animation: the level table, named in the plan and the report; `Motion:` line in the verification report; definition-of-done item; reduced motion is emulated and checked in step 10
+- `examples/demo-site`: a plain HTML site (Terracotta theme, functional motion) built by following the skill end to end, with its Playwright smoke suite
+
+### Changed
+- Step 2 "Motion and 3D" default is the theme's motion level rather than "functional motion only"
+- Step 6 motion tokens point at the reference block instead of describing it loosely
+- Frontmatter description mentions the motion level and recipes
+
 ## 3.1.0 — 2026-10-06
 
 Colour themes, and the skill becomes an agent-agnostic, open-source Agent Skill.

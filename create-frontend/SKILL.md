@@ -1,10 +1,10 @@
 ---
 name: "create-frontend"
-description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, picks a named colour theme from a contrast-checked library (or derives one from the brand), builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy."
+description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, picks a named colour theme from a contrast-checked library (or derives one from the brand) and a motion level with paste-ready recipes, builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy."
 license: "MIT"
 compatibility: "Any Agent Skills client. scripts/ need Node 18+ and a POSIX shell; browser, visual and accessibility checks need a browser tool or Playwright."
 metadata:
-  version: "3.1.0"
+  version: "3.2.0"
   homepage: "https://github.com/vardhan23v/create-frontend-skill"
 ---
 
@@ -69,7 +69,7 @@ Infer what is safe to infer. Ask one short batch of questions only for items tha
 | Performance | Core Web Vitals targets (step 8) | Unusual constraints (slow networks, very large data) |
 | Loading, error, empty, success states | Always, on every async view | - |
 | Design references and colour | Use what is supplied; otherwise a named theme from step 6, chosen by project type | Brand matters and nothing is supplied |
-| Motion and 3D | Functional motion only (step 7); no 3D | The user asks for it, or a reference relies on it |
+| Motion and 3D | The motion level the theme defaults to, usually `functional` (step 7, `references/motion.md`); no 3D | The user asks for more or less motion, or a reference relies on it |
 | Favicon and app icons | Always; from the user's logo or an original mark (step 7) | - |
 | Deploy target, environment variables, integrations | Record what is known | A host or integration forces a framework choice |
 
@@ -144,7 +144,7 @@ Before building more than a screen or two, define the tokens once and use them e
 
 - Put them in CSS custom properties or the Tailwind theme, never as scattered literal values
 - A tiny project gets a short token file, not a design system
-- **Motion tokens**: two or three durations (about 120, 200 and 320 ms) and two easings (ease-out for entrances, ease-in for exits), defined once; every animation uses them. What may move, and how, is in step 7.
+- **Motion tokens**: three durations (120, 200 and 320 ms), two easings (ease-out for entrances, ease-in for exits) and a travel distance, defined once and collapsed under `prefers-reduced-motion`; the exact block is in `references/motion.md`, and every animation uses them. What may move, and how, is in step 7.
 - **Fonts**: at most two families (the chosen theme names a pairing); `font-display: swap`; self-host or preconnect
 
 ### Colour theme
@@ -237,8 +237,16 @@ A real 404 page and a top-level error boundary (or framework error page) with a 
 
 Motion must explain something: where an element came from, what changed, what is loading. Decorative or looping motion with no job is removed, not polished.
 
+`references/motion.md`, next to this file, holds the tokens, three motion levels and twelve paste-ready recipes (hover and press, menu and dialog open/close, reveal once on scroll, staggered entrance, accordion, tab indicator, skeleton, toast, theme cross-fade, page and view transitions, scroll-driven hero, count-up), each with reduced motion built in. Pick the level first and name it in the plan and the report:
+
+| Level | Use for |
+|---|---|
+| `minimal` | Paper & Ink, Gallery, Brass, Pewter; reading-heavy pages, dense tools, "no animation" requests: hover, press, focus, open/close, skeletons only |
+| `functional` (default) | Harbour, Forest, Terracotta, Midnight, Dusk and any app: minimal plus reveal-once, accordion and tab indicators, toasts, theme cross-fade |
+| `expressive` | Birch, Citrus, landing and launch pages, or when asked: functional plus staggered hero entrance, scroll-driven hero, view transitions, count-ups |
+
 - Use the motion tokens from step 6; no ad-hoc durations or easings
-- Implement in this order and stop at the first that works: CSS transitions and keyframes (hover, focus, open and close, skeletons) → the View Transitions API for page and list changes where supported → a library only for orchestration, gestures, layout or shared-element animation: `motion` in React, GSAP for complex timelines and scroll choreography, dotLottie for designer-made vector animations
+- Use the recipes as written; implement in this order and stop at the first that works: CSS transitions and keyframes (hover, focus, open and close, skeletons) → the View Transitions API for page and list changes where supported → a library only for orchestration, gestures, layout or shared-element animation: `motion` in React, GSAP for complex timelines and scroll choreography, dotLottie for designer-made vector animations (the reference's library table says when each is justified)
 - Animate `transform` and `opacity` only; never `width`, `height`, `top`, `left` or shadows in a loop. `will-change` only on elements about to animate, removed afterwards.
 - Scroll-driven animation: CSS scroll-driven animations where supported, otherwise IntersectionObserver; never the scroll event. Reveal-on-scroll runs once, and the content is visible without JavaScript.
 - Budget: entrances at most 400 ms, micro-interactions 100 to 250 ms, one animated focal point per view, nothing that delays the user's next action
@@ -352,7 +360,7 @@ followed by manual steps the user can run: the command to start the app, the URL
 
 ### Accessibility verification
 
-Semantic HTML existing in the code is not verification. When a browser is available: tab through every page (order logical, focus visible, no traps); Enter and Space activate buttons, Enter activates links; Escape closes dialogs and focus returns to the trigger; arrow keys move within menus and tabs; forms announce labels and errors; zoom to 200% without clipping; reduced motion honoured; touch targets checked; contrast checked twice, the tokens with `scripts/check-contrast.js` and the rendered pages with axe. Run the axe scan and fix serious and critical issues. When no browser is available, report the review as code-level only.
+Semantic HTML existing in the code is not verification. When a browser is available: tab through every page (order logical, focus visible, no traps); Enter and Space activate buttons, Enter activates links; Escape closes dialogs and focus returns to the trigger; arrow keys move within menus and tabs; forms announce labels and errors; zoom to 200% without clipping; reduced motion honoured (emulate `prefers-reduced-motion: reduce` and confirm nothing travels); touch targets checked; contrast checked twice, the tokens with `scripts/check-contrast.js` and the rendered pages with axe. Run the axe scan and fix serious and critical issues. When no browser is available, report the review as code-level only.
 
 Stop any server you started. Delete screenshots and temporary files unless the user wants them.
 
@@ -402,6 +410,7 @@ Framework:
 Language:
 Styling:
 Theme: (name from references/themes.md, derived from brand, or existing tokens; modes shipped)
+Motion: (minimal | functional | expressive, and which recipes were used)
 Testing:
 Build tool:
 
@@ -440,6 +449,7 @@ DEPLOYMENT NOTES
 
 - [ ] Project classified; existing conventions followed, or the stack choice stated with a reason
 - [ ] Colour theme named (existing tokens, derived from brand, or one from the library); contrast checked in every shipped mode
+- [ ] Motion level named; every animation uses the tokens and honours reduced motion (checked in the browser, not assumed)
 - [ ] Code, types, build and tests pass (pre-existing failures reported, not hidden)
 - [ ] Browser, visual and accessibility checks run, or reported as not available with manual steps
 - [ ] Loading, empty, error and success states exist on every async view

@@ -4,7 +4,7 @@
 
 An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and any other agent that reads `SKILL.md`. It turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, pick a contrast-checked colour theme, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
 
-**Version:** 3.1.0 · **Licence:** MIT · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
+**Version:** 3.2.0 · **Licence:** MIT · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
 
 ---
 
@@ -17,6 +17,7 @@ An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Cla
 - [Workflow](#workflow)
 - [Stack decisions](#stack-decisions)
 - [Colour themes](#colour-themes)
+- [Motion](#motion)
 - [When backend work is required](#when-backend-work-is-required)
 - [Testing expectations](#testing-expectations)
 - [Verification levels](#verification-levels)
@@ -69,6 +70,7 @@ The skill is the `create-frontend/` folder, in the standard Agent Skills layout:
 create-frontend/
   SKILL.md                    the workflow (self-sufficient: an appendix carries the theme tokens in compact form)
   references/themes.md        eleven colour themes with light and dark tokens, fonts, shape and wiring
+  references/motion.md        motion tokens, three motion levels and twelve paste-ready animation recipes
   scripts/check-contrast.js   WCAG contrast checker for a token file (Node 18+, no dependencies)
   scripts/scaffold.sh         non-interactive scaffolds for Vite+React, Next.js, Astro, Vue, Svelte, plain HTML
   scripts/install.sh          installs or updates the skill for your agent(s)
@@ -198,6 +200,17 @@ node create-frontend/scripts/check-contrast.js tokens.json
 
 Dark mode is not an inversion of light: backgrounds are the darkest value, surfaces are lifted, primaries are lightened, and text is off-white. Light and dark both ship only when the project or user wants them; otherwise one mode is kept and the other block deleted.
 
+## Motion
+
+Step 7 used to say only what motion may do; now it ships the motion the way it ships colour. [`create-frontend/references/motion.md`](create-frontend/references/motion.md) has:
+
+- **Tokens**: three durations, two easings, a spring and a travel distance, defined once and collapsed to 1 ms and 0 px under `prefers-reduced-motion`, so end-of-transition listeners still fire for reduced-motion users
+- **Three levels**, picked by project type like the themes: `minimal` (hover, press, open/close, skeletons), `functional` (plus reveal-once on scroll, accordion and tab indicators, toasts, theme cross-fade; the default) and `expressive` (plus staggered hero entrance, scroll-driven hero, page and view transitions, count-ups; landing pages and Birch/Citrus)
+- **Twelve recipes**, CSS first, `transform` and `opacity` only: reveal-once uses CSS scroll-driven animations with an IntersectionObserver fallback and is visible without JavaScript; dialogs and popovers animate from `display: none` with `@starting-style`; accordions animate height with `grid-template-rows`; the skeleton shimmer is the one permitted loop
+- **A library table** that says exactly when `motion`, GSAP or dotLottie are justified, and that they are lazy-loaded and their cost reported
+
+The level is named in the plan and in the report's `Motion:` line, and step 10 checks reduced motion in the browser rather than assuming it.
+
 ## When backend work is required
 
 The skill is frontend-only but detects these triggers: authentication and sessions, roles and permissions, database persistence, server-side validation, private API or service-role keys, file uploads to storage, payments, email or SMS, server-side processing, scheduling or webhooks, and anything other users must see after a reload.
@@ -254,7 +267,7 @@ When blocked by missing credentials, an unavailable service or tool, or a decisi
 Every run ends with:
 
 ```
-PROJECT            framework, language, styling, theme, testing, build tool
+PROJECT            framework, language, styling, theme, motion level, testing, build tool
 IMPLEMENTED        what was built
 VERIFIED           code, types, build, tests, browser, visual, accessibility — each with its result
 NOT VERIFIED       what, why, and the manual command
@@ -274,6 +287,7 @@ Edit `create-frontend/SKILL.md` unless the table says otherwise:
 | Default framework, styling or test stack | The decision table in step 3 |
 | Team constraints the skill must respect | Add them to `AGENTS.md` or `CLAUDE.md`; the skill reads them in step 1 and ranks them above its own defaults |
 | Which theme a project type gets | The project → theme table in step 6 |
+| Which motion level a project gets, or a recipe | The level table in step 7; `create-frontend/references/motion.md` |
 | Add or change a colour theme | `create-frontend/references/themes.md`; run `node create-frontend/scripts/check-contrast.js` on the new values until it exits 0 |
 | Your company's palette as the only theme | Replace the library with one theme derived from your brand and delete the project → theme table |
 | Folder layout | Step 5 |
@@ -313,7 +327,8 @@ Be aware of this before relying on the skill.
 - `install.sh` is exercised in CI for symlink, copy, project scope, a path with spaces, re-running over a copy, refusing a foreign directory and refusing to run from inside an installed copy
 - `scaffold.sh` scaffolded and built all five stacks (Vite + React, Next.js, Astro, Vue, Svelte) in the Scaffold drift workflow on 6 Oct 2026, and `vite-react` and `vue` were also run locally; the flags will still drift, which is what the monthly run is for
 - A release-review pass (three reviewers, each must-fix independently re-verified) found and fixed: `--shadow-card: none` cancelling Tailwind focus rings, wrong dark-only instructions, Astro needing `is:inline`, `next-themes` needing `attribute="class"`, an installer that could delete itself, path targets split on spaces, and stale hex values in one theme's notes
-- Not yet done: a real build driven by the skill with one of the themes; rendering the font pairings (checked by name against Google Fonts only)
+- A real build driven by the skill: [`examples/demo-site`](examples/demo-site) (plain HTML, Terracotta, functional motion, light and dark) was built by following SKILL.md end to end on 6 Oct 2026; 14 Playwright smoke tests pass at desktop and mobile, axe reports 0 violations on both pages, and the reveal and theme cross-fade recipes from `references/motion.md` were checked in a browser including under reduced motion
+- Not yet done: a framework build (Vite + React, Next.js or Astro) driven by the skill; rendering the font pairings beyond the demo's Fraunces / Nunito Sans
 
 **Verification performed on 3.0.0 (4 Oct 2026, in a sandbox):**
 
