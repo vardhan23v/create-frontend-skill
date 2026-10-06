@@ -89,6 +89,7 @@ create-frontend-skill/create-frontend/scripts/install.sh agents claude
 | Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and other clients that scan the shared convention | `~/.agents/skills/` (`install.sh agents`) | `.agents/skills/` (`install.sh --project agents`) |
 | Claude Code | `~/.claude/skills/` (`install.sh claude`) | `.claude/skills/` (`install.sh --project claude`) |
 | GitHub Copilot in VS Code (native location) | `~/.copilot/skills/` (`install.sh copilot`) | `.github/skills/` (`install.sh --project copilot`) |
+| Hermes Agent | `~/.hermes/skills/` (`install.sh hermes`) | `.agents/skills/` (`install.sh --project hermes`) |
 | Anything else | `install.sh <path your agent documents>` | same, with `--project` |
 
 The `.agents/skills/` convention is described in the [Agent Skills implementor guide](https://agentskills.io/client-implementation/adding-skills-support); each client's own documentation lists its native directory. Claude Code is the notable exception and reads only `.claude/skills/`.

@@ -7,6 +7,7 @@
 #                                          Gemini CLI, OpenCode and other Agent Skills clients)   [default]
 #              claude   ~/.claude/skills   Claude Code (it does not read ~/.agents/skills)
 #              copilot  ~/.copilot/skills  GitHub Copilot's native location
+#              hermes   ~/.hermes/skills   Hermes Agent
 #              <path>   any skills directory your agent documents
 #   --project  install into the current project instead of the home directory:
 #              ./.agents/skills, ./.claude/skills, ./.github/skills
@@ -23,7 +24,7 @@ for a in "$@"; do
   case "$a" in
     --copy) mode='copy' ;;
     --project) scope='project' ;;
-    -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
     --*) echo "unknown option: $a" >&2; exit 2 ;;
   esac
 done
@@ -40,6 +41,7 @@ resolve() {
     agents)  [ "$scope" = project ] && echo ".agents/skills"  || echo "$HOME/.agents/skills" ;;
     claude)  [ "$scope" = project ] && echo ".claude/skills"  || echo "$HOME/.claude/skills" ;;
     copilot) [ "$scope" = project ] && echo ".github/skills"  || echo "$HOME/.copilot/skills" ;;
+    hermes)  [ "$scope" = project ] && echo ".agents/skills"  || echo "$HOME/.hermes/skills" ;;
     *) echo "$1" ;;
   esac
 }
