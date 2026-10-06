@@ -30,6 +30,10 @@ jobs:
         with:
           node-version: 22
 
+      # The runner's bundled npm can lag; the job tests the scaffolders, not an old npm.
+      - name: Latest npm
+        run: npm install -g npm@latest && npm --version
+
       - name: Scaffold
         run: sh create-frontend/scripts/scaffold.sh "${{ matrix.kind }}" "$RUNNER_TEMP/app" < /dev/null
 
