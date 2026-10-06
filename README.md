@@ -1,4 +1,4 @@
-# front-end-skill-claude-code
+# create-frontend-skill
 
 An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and any other agent that reads `SKILL.md`. It turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, pick a contrast-checked colour theme, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
 
@@ -75,11 +75,11 @@ create-frontend/
 Clone once, then install for the agent(s) you use. The installer symlinks the folder by default, so `git pull` in the clone updates every install; pass `--copy` if your agent cannot follow symlinks.
 
 ```bash
-git clone https://github.com/vardhan23v/front-end-skill-claude-code.git
+git clone https://github.com/vardhan23v/create-frontend-skill.git
 ```
 
 ```bash
-front-end-skill-claude-code/create-frontend/scripts/install.sh agents claude
+create-frontend-skill/create-frontend/scripts/install.sh agents claude
 ```
 
 | Agent | User-level directory | Project-level directory |

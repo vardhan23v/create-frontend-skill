@@ -5,7 +5,7 @@ license: "MIT"
 compatibility: "Any Agent Skills client. scripts/ need Node 18+ and a POSIX shell; browser, visual and accessibility checks need a browser tool or Playwright."
 metadata:
   version: "3.1.0"
-  homepage: "https://github.com/vardhan23v/front-end-skill-claude-code"
+  homepage: "https://github.com/vardhan23v/create-frontend-skill"
 ---
 
 # Create Frontend
