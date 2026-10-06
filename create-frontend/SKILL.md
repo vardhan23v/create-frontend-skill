@@ -41,6 +41,7 @@ For a new project, or a feature over about three screens, write a short plan fir
 Existing conventions win over this skill's defaults unless the user asks for a change or a convention blocks the task. Inspect:
 
 - `package.json`: framework, scripts (`dev`, `build`, `test`, `lint`, `typecheck`), dependencies, `engines`; `.nvmrc`
+- Team constraints: `AGENTS.md`, `CLAUDE.md`, a contributing guide, lint and format config; these rank above this skill's defaults (step 3)
 - Lockfile decides the package manager: `pnpm-lock.yaml` pnpm, `yarn.lock` yarn, `bun.lock`/`bun.lockb` bun, `package-lock.json` npm. Never mix managers.
 - Config: `vite.config.*`, `next.config.*`, `astro.config.*`, `tsconfig.json`, ESLint, Prettier, Tailwind
 - Routing: file-based (`app/`, `pages/`, `src/pages/`) or a router package and its route table
@@ -101,7 +102,7 @@ An existing stack is preserved unless the user asks for a migration. For a new p
 | 3D | Keep | None | 3D is the content or the user asks: `<model-viewer>` for a model, `three` + `@react-three/fiber` for a scene (step 7) |
 | Build tooling | Keep | The framework's own (Vite, Next, Astro) | - |
 
-Scaffold: `scripts/scaffold.sh <vite-react|next|astro|vue|svelte|html> <name>`, next to this file, runs the official scaffolders non-interactively with current flags. Without it: `npm create vite@latest <name> -- --template react-ts`, `npx create-next-app@latest <name>`, `npm create astro@latest`, `npm create vue@latest`, `npx sv create`. These change between major versions: if the script or a command fails or prompts unexpectedly, read the tool's current docs rather than guessing flags, and prefer non-interactive flags. With Vite + Tailwind: `npm install tailwindcss @tailwindcss/vite`, add the plugin to `vite.config.ts`, put `@import "tailwindcss";` in the main CSS.
+Scaffold: `scripts/scaffold.sh <vite-react|next|astro|vue|svelte|html> <name>`, next to this file, runs the official scaffolders non-interactively with current flags. Without it: `npm create vite@latest <name> -- --template react-ts --no-interactive`, `npx create-next-app@latest <name> --yes`, `npm create astro@latest`, `npm create vue@latest`, `npx sv create`. These change between major versions: if the script or a command fails or prompts unexpectedly, read the tool's current docs rather than guessing flags, and prefer non-interactive flags. With Vite + Tailwind: `npm install tailwindcss @tailwindcss/vite`, add the plugin to `vite.config.ts`, put `@import "tailwindcss";` in the main CSS.
 
 Add dependencies sparingly and say why for each.
 
@@ -139,7 +140,7 @@ Keep components small and single-purpose. Co-locate a component's styles and tes
 
 ## 6. Design tokens and visual quality
 
-Before building more than a screen or two, define the tokens once and use them everywhere: colours with semantic names (`background`, `foreground`, `surface`, `muted`, `border`, `primary`, `accent`, `ring`, `danger`, `success`, `warning`, each with a `-foreground` where text sits on it), type scale, spacing scale, radii, shadows, breakpoints, and the states each interactive component needs (hover, focus, active, disabled, loading, error).
+Before building more than a screen or two, define the tokens once and use them everywhere: colours with semantic names (`background`, `foreground`, `surface`, `muted`, `border`, `input`, `primary`, `accent`, `ring`, `danger`, `success`, `warning`, each with a `-foreground` where text sits on it), type scale, spacing scale, radii, shadows, breakpoints, and the states each interactive component needs (hover, focus, active, disabled, loading, error).
 
 - Put them in CSS custom properties or the Tailwind theme, never as scattered literal values
 - A tiny project gets a short token file, not a design system
@@ -172,7 +173,7 @@ Choose the palette deliberately before the first screen, name it in the plan and
 | Luxury, wealth, law, premium services | Brass |
 
 - Copy the theme's `:root` and `.dark` blocks and the wiring from the reference; components use tokens only, never the hex values. Form controls use the `input` token for their outline, focus rings use `ring` with a 2px offset in `background`.
-- Light and dark: ship both when the project or user wants them. The `.dark` class goes on `<html>` from a blocking inline script in `<head>` before any stylesheet (no flash), `color-scheme` follows the class, and Next.js needs `suppressHydrationWarning` on `<html>`; the reference has the exact snippet. Otherwise keep one mode (dark for a dark-first product such as Midnight) and delete the other block.
+- Light and dark: ship both when the project or user wants them. The `.dark` class goes on `<html>` from a blocking inline script in `<head>` before any stylesheet (no flash; `is:inline` in Astro), `color-scheme` follows the class, and Next.js needs `suppressHydrationWarning` on `<html>`; the reference has the exact snippet. Single mode: light-only deletes the `.dark` block; dark-only (a dark-first product such as Midnight) copies the `.dark` values over the matching lines in `:root` and deletes `.dark`; both drop the script and the dark variant.
 - Colour is scarce: `primary` for the one main action per view and for links; `accent` for selected states, badges and highlights (fill-only where the theme says so); status colours only for status, and never as text inside a `muted` fill; everything else neutral. A screen that is mostly `background`, `surface` and `foreground` with one `primary` reads as designed; one that uses every token reads as a template.
 - Changed or derived any value? Run `node <skill directory>/scripts/check-contrast.js tokens.json` (text pairs at least 4.5:1, UI pairs 3:1, in every shipped mode) and fix each failing pair before building on it; its warnings name hue collisions and fill-only tokens
 
@@ -457,6 +458,7 @@ DEPLOYMENT NOTES
 - No commits, pushes or deploys unless asked
 - Never claim a verification you did not run
 - A frontend that has not been built and run is not finished
+
 ## Appendix: theme tokens (single-file fallback)
 
 Use this only when `references/themes.md` is not next to this file. The reference has the same values with fonts, shadows, usage notes and wiring; prefer it. Columns are in the order of the CSS variable names (`--background`, `--foreground`, …, `--warning-foreground`); `input` is the form-control outline, `ring` the focus ring (drawn with a 2px offset in `background`). Every row passed `scripts/check-contrast.js` when generated.

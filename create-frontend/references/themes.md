@@ -79,13 +79,15 @@ Paste the theme's `:root` and `.dark` blocks into the global stylesheet, then ma
   --shadow-popover: var(--shadow-popover);
 }
 
-html { color-scheme: light; }
-html.dark { color-scheme: dark; }
-body { background: var(--background); color: var(--foreground); font-family: var(--font-body); }
-h1, h2, h3 { font-family: var(--font-heading); }
+@layer base {
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font-body); }
+  h1, h2, h3 { font-family: var(--font-heading); }
+}
 ```
 
-Then `bg-background text-foreground`, `bg-primary text-primary-foreground`, `border-border` on cards, `border-input` on form controls, `rounded-md`, `shadow-card`, `shadow-popover`, `font-heading`, and for focus `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`.
+The base rules sit in `@layer base` so utilities on the same element still win. Then `bg-background text-foreground`, `bg-primary text-primary-foreground`, `border-border` on cards, `border-input` on form controls, `rounded-md`, `shadow-card`, `shadow-popover`, `font-heading`, and for focus `focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2` (an outline, not a box-shadow ring, so it survives `shadow-*` on the same element and Windows forced-colors mode). Flat themes set `--shadow-card: 0 0 #0000` rather than `none`, because Tailwind composes shadows into one comma list and `none` would invalidate it.
 
 **Plain CSS or CSS modules**: use the variables directly (`background: var(--surface); border: 1px solid var(--border);`); focus is `outline: 2px solid var(--ring); outline-offset: 2px;`.
 
@@ -102,11 +104,12 @@ Ship both only when the project or user wants them. The `.dark` class must be on
 </script>
 ```
 
-- Vite and Astro: put it in `index.html` / the layout `<head>` as the first child.
-- Next.js App Router: the server does not know the stored preference, so render `<html suppressHydrationWarning>` and inject the same script in `<head>` with `<script dangerouslySetInnerHTML={{ __html: '...' }} />` (or use `next-themes`, which does exactly this). Without `suppressHydrationWarning`, React warns about the class mismatch.
-- `color-scheme` follows the class (`html.dark { color-scheme: dark }`), not the OS, so form controls and scrollbars match the chosen mode. Set `<meta name="theme-color">` for each mode via `media="(prefers-color-scheme: ...)"`, or update it from the toggle.
+- Vite: first child of `<head>` in `index.html`.
+- Astro: first child of the layout's `<head>` as `<script is:inline>`. Without `is:inline` Astro bundles it as a deferred `type="module"` script and the page flashes.
+- Next.js App Router: the server does not know the stored preference, so render `<html suppressHydrationWarning>` and inject the same script in `<head>` with `<script dangerouslySetInnerHTML={{ __html: '...' }} />`, or use `next-themes` with `<ThemeProvider attribute="class">` (its default attribute is `data-theme`, which none of these selectors match; its default storage key `theme` matches the script). Without `suppressHydrationWarning`, React warns about the class mismatch.
+- `color-scheme` follows the class (`html.dark { color-scheme: dark }`), not the OS, so form controls and scrollbars match the chosen mode. Update `<meta name="theme-color">` from the toggle (a `media` query would follow the OS instead).
 - The toggle writes `localStorage.theme` and adds or removes the class. Offer a "system" option by removing the key.
-- For a single-mode project keep one block, delete the other, drop the `@custom-variant` line and the script, and set `color-scheme` to that mode.
+- Single mode: light-only, delete the `.dark` block. Dark-only, copy the twenty values from the `.dark` block over the matching colour and shadow lines in `:root` (keep the font and radius lines) and delete `.dark`. In both cases drop the `@custom-variant` line and the script, and set `html { color-scheme: <mode>; }`.
 
 **Checking changes**: after deriving from a brand or editing any value, write the tokens as `{"light": {...}, "dark": {...}}` (camelCase keys: `mutedForeground`, `primaryForeground`, …) and run `node <skill directory>/scripts/check-contrast.js tokens.json`. Fix every pair reported with `ok: false` before building on the palette, and read the warnings: they name hue collisions and tokens that are fill-only.
 
@@ -213,7 +216,7 @@ Warm cream stock with ink-dark text, a fountain-pen blue for links and actions a
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 4px 12px rgba(34, 30, 26, 0.12);
 }
 .dark {
@@ -235,7 +238,7 @@ Warm cream stock with ink-dark text, a fountain-pen blue for links and actions a
   --success-foreground: #141a0f;
   --warning: #e0a94a;
   --warning-foreground: #1f1608;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 ```
@@ -277,7 +280,7 @@ Cool, quiet and engineered: blue-grey neutrals stay out of the way so tables and
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 4px 12px rgba(26, 36, 48, 0.12);
 }
 .dark {
@@ -299,7 +302,7 @@ Cool, quiet and engineered: blue-grey neutrals stay out of the way so tables and
   --success-foreground: #08261a;
   --warning: #e3a84a;
   --warning-foreground: #2b1a04;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 ```
@@ -469,7 +472,7 @@ Navy-ink dark mode with an electric cyan primary and a lime accent that glow lik
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 4px 12px rgba(4, 27, 47, 0.12);
 }
 .dark {
@@ -491,7 +494,7 @@ Navy-ink dark mode with an electric cyan primary and a lime accent that glow lik
   --success-foreground: #021709;
   --warning: #fab549;
   --warning-foreground: #231200;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 ```
@@ -568,8 +571,8 @@ Tangerine actions on warm off-white with an aubergine ink and a grape accent: en
 - **Avoid for:** Healthcare, finance and government (use Harbour); luxury and editorial brands (use Brass or Paper & Ink); data-dense dashboards (use Pewter)
 - **Fonts:** Red Hat Display for headings, Red Hat Text for body (Google Fonts). Red Hat Display has round, open headline forms that feel friendly without the geometric template look; Red Hat Text is its matching text face, so the pair is one voice at two sizes.
 - **Shape:** round corners (8px / 12px / 20px); soft elevation
-- **Use:** Keep the page mostly cream and aubergine; reserve the tangerine primary for the single main action, links and active navigation, and let the brighter ring colour carry focus states. Use the grape-grape accent sparingly for selected rows, badges, progress and the second chart series so it stays a highlight rather than a competing brand colour. Lean on the marigold-tinted muted fill and tan border for structure instead of grey, and aim for roughly one accent element per screen section. Warning stays in text, badges and thin banners rather than large fills beside primary actions; dividers inside muted regions use foreground at about 14% alpha; links inside muted fills are underlined.
-- **Dark mode:** The aubergine ink becomes the neutral base: background is a plum-black (L≈0.7%), surface and muted step up a few percent in lightness on the same hue, and the cream page colour becomes the off-white foreground. Primary, accent and status colours keep their hues but rise in lightness and drop in saturation (tangerine #b35400 → #f0954f, jade #0f7f66 → #5fd4ad), so each passes as text on the dark background while their foregrounds flip to deep tints of the same hue.
+- **Use:** Keep the page mostly cream and aubergine; reserve the tangerine primary for the single main action, links and active navigation, and let the brighter ring colour carry focus states. Use the grape accent sparingly for selected rows, badges, progress and the second chart series so it stays a highlight rather than a competing brand colour. Lean on the marigold-tinted muted fill and tan border for structure instead of grey, and aim for roughly one accent element per screen section. Warning stays in text, badges and thin banners rather than large fills beside primary actions; dividers inside muted regions use foreground at about 14% alpha; links inside muted fills are underlined.
+- **Dark mode:** The aubergine ink becomes the neutral base: background is a plum-black (L≈0.7%), surface and muted step up a few percent in lightness on the same hue, and the cream page colour becomes the off-white foreground. Primary, accent and status colours keep their hues but rise in lightness and drop in saturation (tangerine #a84e00 → #f0954f, grape #7a3fb0 → #c49bf0), so each passes as text on the dark background while their foregrounds flip to deep tints of the same hue.
 - **Contrast (checked):** body text 13.62:1 light, 15.68:1 dark; lowest text pair 5.08:1 light (successForeground on success), 6.32:1 dark (danger on surface); lowest UI pair 3.06:1 light, 3.11:1 dark. success never as text inside a muted fill
 
 ```css
@@ -597,7 +600,7 @@ Tangerine actions on warm off-white with an aubergine ink and a grape accent: en
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
-  --shadow-card: 0 1px 2px rgba(59, 31, 66, 0.06), 0 4px 14px rgba(179, 84, 0, 0.10);
+  --shadow-card: 0 1px 2px rgba(59, 31, 66, 0.06), 0 4px 14px rgba(168, 78, 0, 0.10);
   --shadow-popover: 0 4px 12px rgba(59, 31, 66, 0.12);
 }
 .dark {
@@ -661,7 +664,7 @@ White-cube walls, black type and one cobalt signal: buttons are ink, not colour;
   --radius-sm: 0px;
   --radius-md: 2px;
   --radius-lg: 4px;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 4px 12px rgba(28, 27, 24, 0.12);
 }
 .dark {
@@ -683,7 +686,7 @@ White-cube walls, black type and one cobalt signal: buttons are ink, not colour;
   --success-foreground: #121a0c;
   --warning: #e3a84e;
   --warning-foreground: #1e1507;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 ```
@@ -789,7 +792,7 @@ Antique, unpolished brass on ivory and charcoal with a bottle-green second colou
   --radius-sm: 0px;
   --radius-md: 2px;
   --radius-lg: 4px;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 4px 12px rgba(30, 27, 23, 0.12);
 }
 .dark {
@@ -811,7 +814,7 @@ Antique, unpolished brass on ivory and charcoal with a bottle-green second colou
   --success-foreground: #0f1f14;
   --warning: #f0862e;
   --warning-foreground: #2a1a08;
-  --shadow-card: none;
+  --shadow-card: 0 0 #0000;
   --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 ```

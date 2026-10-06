@@ -80,3 +80,14 @@ jobs:
           if sh create-frontend/scripts/install.sh "$HOME/.other/skills" 2> /dev/null; then
             echo "install.sh replaced a directory that is not a create-frontend install" >&2; exit 1
           fi
+          # a path with a space is one target, not two
+          sh create-frontend/scripts/install.sh "$HOME/My Skills" && test -L "$HOME/My Skills/create-frontend"
+          # re-running over a copy moves it aside instead of deleting it
+          echo "local edit" >> "$HOME/.claude/skills/create-frontend/SKILL.md"
+          sh create-frontend/scripts/install.sh --copy claude
+          ls -d "$HOME/.claude/skills/create-frontend.bak."* > /dev/null
+          # running the installer from inside an installed copy must refuse rather than delete itself
+          if sh "$HOME/.claude/skills/create-frontend/scripts/install.sh" claude 2> /dev/null; then
+            echo "install.sh ran from an installed copy and did not refuse" >&2; exit 1
+          fi
+          test -f "$HOME/.claude/skills/create-frontend/SKILL.md"

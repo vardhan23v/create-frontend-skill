@@ -11,7 +11,7 @@ Colour themes, and the skill becomes an agent-agnostic, open-source Agent Skill.
 - `scripts/install.sh`: symlinks (or copies) the skill into `~/.agents/skills`, `~/.claude/skills`, a project, or any directory, so `git pull` updates every install
 - `LICENSE`: MIT; frontmatter declares `license`, `compatibility` and `metadata.version`
 - Step 6 "Colour theme": existing tokens win; a supplied brand derives a theme; otherwise a project → theme table decides, and the choice is named in the plan and the report
-- Step 6 wiring: Tailwind v4 `@theme inline` mapping, focus rings with a 2px offset, `color-mix` recipes for hover, selection and secondary-on-primary, and a dark-mode setup without a flash (blocking inline script in `<head>`, `color-scheme` on the class, `suppressHydrationWarning` for Next.js)
+- `references/themes.md` wiring: Tailwind v4 `@theme inline` mapping with base rules in `@layer base`, outline-based focus that survives `shadow-*` and forced-colors mode, `color-mix` recipes for hover, selection and secondary-on-primary, and a dark-mode setup without a flash (blocking inline script in `<head>`, `is:inline` for Astro, `color-scheme` on the class, `suppressHydrationWarning` or `next-themes` with `attribute="class"` for Next.js); flat themes use `0 0 #0000` so `shadow-card` never cancels a ring
 - `SKILL.md` appendix: the theme tokens in compact form and an inline contrast check, so a single-file install still works
 - Verification report: `Theme:` line in PROJECT; definition of done: theme named and contrast checked in every shipped mode
 - README: Colour themes section, multi-agent install table, licence

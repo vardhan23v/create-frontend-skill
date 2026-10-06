@@ -91,7 +91,10 @@ const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360
 
 const file = process.argv[2];
 if (!file) { console.error('usage: node check-contrast.js <tokens.json>'); process.exit(2); }
-const theme = JSON.parse(fs.readFileSync(file, 'utf8'));
+let theme;
+try { theme = JSON.parse(fs.readFileSync(file, 'utf8')); }
+catch (e) { console.error(`cannot read ${file}: ${e.message}`); process.exit(2); }
+if (!theme || typeof theme !== 'object') { console.error('expected a `light` and/or `dark` object'); process.exit(2); }
 
 const report = { pass: true, modes: {}, invalidHex: [], warnings: [] };
 const modes = ['light', 'dark'].filter((m) => theme[m]);

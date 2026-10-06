@@ -74,7 +74,7 @@ create-frontend/
   scripts/install.sh          installs or updates the skill for your agent(s)
 ```
 
-Clone once, then install for the agent(s) you use. The installer symlinks the folder by default, so `git pull` in the clone updates every install; pass `--copy` if your agent cannot follow symlinks.
+Clone once, then install for the agent(s) you use. The installer symlinks the folder by default, so `git pull` in the clone updates every install; pass `--copy` if your agent cannot follow symlinks. Re-running the installer replaces a copied install (the old copy is moved aside as `create-frontend.bak.<timestamp>`), so keep customisations in the clone, not in the copy. Run it from the clone, never from inside a skills directory.
 
 ```bash
 git clone https://github.com/vardhan23v/create-frontend-skill.git
@@ -91,13 +91,13 @@ create-frontend-skill/create-frontend/scripts/install.sh agents claude
 | GitHub Copilot in VS Code (native location) | `~/.copilot/skills/` (`install.sh copilot`) | `.github/skills/` (`install.sh --project copilot`) |
 | Anything else | `install.sh <path your agent documents>` | same, with `--project` |
 
-Which directories a client scans is documented in the [Agent Skills implementor guide](https://agentskills.io/client-implementation/adding-skills-support); the `.agents/skills/` convention is the one most clients share, and Claude Code is the notable exception.
+The `.agents/skills/` convention is described in the [Agent Skills implementor guide](https://agentskills.io/client-implementation/adding-skills-support); each client's own documentation lists its native directory. Claude Code is the notable exception and reads only `.claude/skills/`.
 
 If you copy only `SKILL.md` somewhere (for example into a hosted skill store that accepts a single file), the skill still works: step 6 falls back to the appendix for theme tokens and to an inline contrast check, and step 3 falls back to the plain scaffold commands. You lose the full reference, the per-theme wiring notes and the helper scripts, so prefer the folder.
 
 ## Usage
 
-Your agent loads the skill when a request matches its description. Most agents also let you invoke it by name (`/create-frontend` in Claude Code and Codex, `$create-frontend` or a mention in others):
+Your agent loads the skill when a request matches its description. Most agents also let you invoke it by name (`/create-frontend` in Claude Code, `$create-frontend` in Codex, a mention in others):
 
 ```
 /create-frontend
@@ -229,7 +229,7 @@ Existing project tools are preferred. Tests must be able to fail; render-only te
 | Build | Production build, bundle sizes | `npm run build` |
 | Tests | Existing and new tests | project `test`, `npx playwright test` |
 | Browser | Routes open, console and network clean, interactions and states work at desktop and mobile widths | dev server + browser tool or Playwright |
-| Visual | Screenshots at 375 and 1280 wide, read by Claude | `npx playwright screenshot …` |
+| Visual | Screenshots at 375 and 1280 wide, read by the agent | `npx playwright screenshot …` |
 | Accessibility | Automated scan plus a keyboard walk | `npx @axe-core/cli <url>` + manual |
 
 Each category is reported separately. If a tool is unavailable the report states exactly what was not verified and gives the command to run manually. Pre-existing failures are reported as pre-existing, never as fixed.

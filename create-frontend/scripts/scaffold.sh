@@ -17,7 +17,7 @@ fi
 
 case "$kind" in
   vite-react)
-    npm create vite@latest "$name" -- --template react-ts
+    npm create vite@latest "$name" -- --template react-ts --no-interactive
     cd "$name" && npm install && npm install tailwindcss @tailwindcss/vite
     echo "next: add tailwindcss() to plugins in vite.config.ts and put '@import \"tailwindcss\";' at the top of src/index.css"
     ;;
@@ -25,7 +25,7 @@ case "$kind" in
     npx create-next-app@latest "$name" --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --yes
     ;;
   astro)
-    npm create astro@latest "$name" -- --template minimal --typescript strict --install --no-git --yes
+    npm create astro@latest "$name" -- --template minimal --install --no-git --yes
     ;;
   vue)
     npm create vue@latest "$name" -- --ts --router --eslint --vitest
