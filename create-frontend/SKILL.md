@@ -1,6 +1,11 @@
 ---
 name: "create-frontend"
-description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, picks a named colour theme from a contrast-checked library (or derives one from the brand), builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy. For visual direction alone, use frontend-design."
+description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, picks a named colour theme from a contrast-checked library (or derives one from the brand), builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy."
+license: "MIT"
+compatibility: "Any Agent Skills client. scripts/ need Node 18+ and a POSIX shell; browser, visual and accessibility checks need a browser tool or Playwright."
+metadata:
+  version: "3.1.0"
+  homepage: "https://github.com/vardhan23v/front-end-skill-claude-code"
 ---
 
 # Create Frontend
@@ -49,7 +54,7 @@ Run the existing `install`, `typecheck`, `lint`, `test` and `build` once before 
 
 ## 2. Settle the requirements
 
-Infer what is safe to infer. Ask one short batch of questions only for items that materially change the implementation. If the user is unavailable, take the most reasonable reading, state it at the top of the report, and continue.
+Infer what is safe to infer. Ask one short batch of questions only for items that materially change the implementation. If the client has a structured question tool, respect its limits (typically four or five questions, each with two to four choices and a free-text "other"); everything a pick-list cannot capture becomes a stated assumption at the top of the plan, which the user can correct in one reply. If the user is unavailable, take the most reasonable reading, state it at the top of the report, and continue.
 
 | Area | Default when not stated | Ask when |
 |---|---|---|
@@ -74,7 +79,7 @@ Priority, highest first:
 1. Explicit user requirements
 2. Existing project architecture
 3. Existing dependencies and conventions
-4. Team or company constraints (`CLAUDE.md`, contributing guides, lint rules)
+4. Team or company constraints (`AGENTS.md`, `CLAUDE.md`, contributing guides, lint rules)
 5. Project requirements
 6. This skill's defaults
 
@@ -96,7 +101,7 @@ An existing stack is preserved unless the user asks for a migration. For a new p
 | 3D | Keep | None | 3D is the content or the user asks: `<model-viewer>` for a model, `three` + `@react-three/fiber` for a scene (step 7) |
 | Build tooling | Keep | The framework's own (Vite, Next, Astro) | - |
 
-Scaffold commands: `npm create vite@latest <name> -- --template react-ts`, `npx create-next-app@latest <name>`, `npm create astro@latest`, `npm create vue@latest`, `npx sv create`. These change between major versions: if one fails or prompts unexpectedly, read the tool's current docs rather than guessing flags, and prefer non-interactive flags. With Vite + Tailwind: `npm install tailwindcss @tailwindcss/vite`, add the plugin to `vite.config.ts`, put `@import "tailwindcss";` in the main CSS.
+Scaffold: `scripts/scaffold.sh <vite-react|next|astro|vue|svelte|html> <name>`, next to this file, runs the official scaffolders non-interactively with current flags. Without it: `npm create vite@latest <name> -- --template react-ts`, `npx create-next-app@latest <name>`, `npm create astro@latest`, `npm create vue@latest`, `npx sv create`. These change between major versions: if the script or a command fails or prompts unexpectedly, read the tool's current docs rather than guessing flags, and prefer non-interactive flags. With Vite + Tailwind: `npm install tailwindcss @tailwindcss/vite`, add the plugin to `vite.config.ts`, put `@import "tailwindcss";` in the main CSS.
 
 Add dependencies sparingly and say why for each.
 
@@ -143,7 +148,7 @@ Before building more than a screen or two, define the tokens once and use them e
 
 ### Colour theme
 
-Choose the palette deliberately before the first screen, name it in the plan and the report, and never start from a framework default or the white-page-with-indigo-buttons look. `references/themes.md`, next to this file, holds ten named themes; each has light and dark token sets, a font pairing, a shape character, and contrast figures produced by `scripts/check-contrast.js`.
+Choose the palette deliberately before the first screen, name it in the plan and the report, and never start from a framework default or the white-page-with-indigo-buttons look. `references/themes.md`, next to this file, holds eleven named themes; each has light and dark token sets, a font pairing, a shape character, ready-to-paste `:root` and `.dark` blocks, and contrast figures produced by `scripts/check-contrast.js`. If this file was installed on its own and `references/` is missing, the appendix at the end of this file has the same tokens in compact form and an inline contrast check.
 
 | Situation | Do |
 |---|---|
@@ -153,27 +158,29 @@ Choose the palette deliberately before the first screen, name it in the plan and
 
 | Project | Theme |
 |---|---|
-| Blog, documentation, newsletter, long-form reading | Paper & Ink |
-| SaaS dashboard, admin panel, internal tool, data-dense UI | Slate |
-| Sustainability, outdoors, food, wellness, non-profit | Forest |
-| Restaurant, café, hospitality, crafts, travel, local business | Terracotta |
-| Developer tool, infrastructure, fintech, security (dark-first) | Midnight |
-| Healthcare, insurance, government, civic, school, consumer banking | Harbor |
-| Consumer app, students, events, community, playful marketing | Citrus |
-| Portfolio, photography, architecture, fashion, agency | Gallery |
-| Creative tool, beauty, lifestyle, music, journaling | Dusk |
+| Product landing page, SaaS marketing site, startup homepage, pricing page | Birch (or the theme of the product it markets) |
+| E-commerce, marketplace, D2C storefront | Birch; artisan or boutique → Terracotta; eco → Forest; luxury → Brass |
+| Blog, help centre, handbook, newsletter, long-form reading | Paper & Ink |
+| SaaS dashboard, admin panel, internal tool, data-dense UI (light-first) | Pewter |
+| Farming, food production, outdoors, nutrition, climate, non-profit | Forest |
+| Restaurant, café, bar, hotel, travel, crafts, local business | Terracotta |
+| Developer tool, infrastructure, developer docs, trading, security (dark-first) | Midnight |
+| Healthcare, insurance, government, civic, school and university sites, consumer fintech | Harbour |
+| Upbeat consumer app, student-facing learning app, events, clubs, recipe and delivery apps | Citrus |
+| Portfolio, photography, architecture, fashion, agency, museum | Gallery |
+| Creative tool, beauty, lifestyle, music, meditation, sleep, journaling, habit tracker | Dusk |
 | Luxury, wealth, law, premium services | Brass |
 
-- Copy the theme's `:root` and `.dark` blocks and the wiring from the reference; components use tokens only, never the hex values
-- Light and dark: ship both when the project or user wants them, driven by `prefers-color-scheme` with a persisted manual toggle and `color-scheme` set. Otherwise keep one mode (dark for a dark-first product) and delete the other block.
-- Colour is scarce: `primary` for the one main action per view and for links; `accent` for selected states, badges and highlights; status colours only for status; everything else neutral. A screen that is mostly `background`, `surface` and `foreground` with one `primary` reads as designed; one that uses every token reads as a template.
-- Changed or derived any value? Run `node <skill directory>/scripts/check-contrast.js tokens.json` (text pairs at least 4.5:1, UI pairs 3:1, in every shipped mode) and fix each failing pair before building on it
+- Copy the theme's `:root` and `.dark` blocks and the wiring from the reference; components use tokens only, never the hex values. Form controls use the `input` token for their outline, focus rings use `ring` with a 2px offset in `background`.
+- Light and dark: ship both when the project or user wants them. The `.dark` class goes on `<html>` from a blocking inline script in `<head>` before any stylesheet (no flash), `color-scheme` follows the class, and Next.js needs `suppressHydrationWarning` on `<html>`; the reference has the exact snippet. Otherwise keep one mode (dark for a dark-first product such as Midnight) and delete the other block.
+- Colour is scarce: `primary` for the one main action per view and for links; `accent` for selected states, badges and highlights (fill-only where the theme says so); status colours only for status, and never as text inside a `muted` fill; everything else neutral. A screen that is mostly `background`, `surface` and `foreground` with one `primary` reads as designed; one that uses every token reads as a template.
+- Changed or derived any value? Run `node <skill directory>/scripts/check-contrast.js tokens.json` (text pairs at least 4.5:1, UI pairs 3:1, in every shipped mode) and fix each failing pair before building on it; its warnings name hue collisions and fill-only tokens
 
 Avoid the generic AI look: gradient backgrounds everywhere, glassmorphism, random animations, a grid of equally rounded cards, decorative elements that do not aid use, and inconsistent spacing or type sizes between screens. Every screen should look like it belongs to the same product.
 
 When a design or reference is supplied, analyse it first: name the characteristics that matter (layout rhythm, type, colour, density, component shapes), reproduce those, and ignore incidental details. The user's brand colours, fonts or design file are the source of truth; the theme library only fills what they leave open.
 
-If the `frontend-design` skill is available and the look matters, load it for visual direction instead of improvising here.
+If a dedicated visual-design skill is installed alongside this one (for example one named `frontend-design`) and the look matters more than usual, load it for art direction. Nothing here depends on it: the theme library, the shape and font choices and the rules above are the visual direction when no such skill exists.
 
 ## 7. Build
 
@@ -450,3 +457,53 @@ DEPLOYMENT NOTES
 - No commits, pushes or deploys unless asked
 - Never claim a verification you did not run
 - A frontend that has not been built and run is not finished
+## Appendix: theme tokens (single-file fallback)
+
+Use this only when `references/themes.md` is not next to this file. The reference has the same values with fonts, shadows, usage notes and wiring; prefer it. Columns are in the order of the CSS variable names (`--background`, `--foreground`, …, `--warning-foreground`); `input` is the form-control outline, `ring` the focus ring (drawn with a 2px offset in `background`). Every row passed `scripts/check-contrast.js` when generated.
+
+| Theme | Mode | background | foreground | surface | muted | muted-foreground | border | input | primary | primary-foreground | accent | accent-foreground | ring | danger | danger-foreground | success | success-foreground | warning | warning-foreground |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Birch | light | #fafaf7 | #16181a | #fefefc | #eeede8 | #5b5f64 | #d8d7d0 | #90908d | #0e7a50 | #effbf4 | #b8431a | #fff6f0 | #15996a | #b01f45 | #fdf2f4 | #4a7a12 | #eefaf1 | #8c5a0a | #fdf6e8 |
+| Birch | dark | #121416 | #e8e8e3 | #1a1d20 | #24282c | #9ea3a8 | #343a3f | #666b6d | #4fd198 | #05231a | #f28a5c | #2a140a | #66dcaa | #f27d8a | #2a0c11 | #a6d65c | #07251a | #e9b24f | #291a05 |
+| Paper & Ink | light | #f8f4ec | #221e1a | #fdfaf4 | #ebe5da | #675e55 | #dcd3c5 | #928b81 | #3d5a73 | #f4f8fb | #a2381d | #fdf6ee | #4f7596 | #ab1f4a | #fdf2f4 | #3f6b34 | #f3f8ee | #8a5a0b | #fdf6e8 |
+| Paper & Ink | dark | #1a1612 | #ece4d6 | #221d18 | #2e2822 | #a89e90 | #3a332b | #716a60 | #8fb0c9 | #14181c | #e07a60 | #1f1410 | #a3c2d8 | #ec7d9e | #1f1114 | #96c284 | #141a0f | #e0a94a | #1f1608 |
+| Pewter | light | #f1f4f7 | #1a2430 | #fafbfc | #e2e7ec | #52616e | #c9d2da | #838c96 | #2b4d50 | #eefafb | #a4408f | #fdf2fa | #1a8d97 | #b52f45 | #fff3f4 | #1c7049 | #ecfaf1 | #8f5a12 | #fff7e8 |
+| Pewter | dark | #10161c | #e3e9ee | #171f26 | #222c35 | #97a6b3 | #303d49 | #606b76 | #45adb5 | #07242a | #c97fb6 | #2a0f24 | #5ec4cc | #e8707c | #2c0a10 | #5cc08a | #08261a | #e3a84a | #2b1a04 |
+| Forest | light | #f2f3e4 | #1c261f | #fafbf4 | #e4e7d2 | #55604f | #cdd2b8 | #868d7b | #2e5c3b | #f5f1e6 | #b07d22 | #1f1706 | #3f7a50 | #ad2a3c | #fbf4ee | #3f7a28 | #f3f8ee | #9c4a0e | #fbf5e8 |
+| Forest | dark | #111a14 | #e9e4d5 | #192319 | #243126 | #a7b19f | #34433a | #656e64 | #86bd8f | #0f1b13 | #d8a94f | #1f1706 | #9bd1a5 | #ec7f88 | #2b100b | #a6d66a | #112009 | #f08a3c | #261b06 |
+| Terracotta | light | #f4ecdf | #2b211a | #fbf6ee | #e9dece | #66554a | #d8c9b4 | #918475 | #a8432a | #fdf6ee | #6b6e27 | #f6f6ea | #c4552f | #b01f48 | #fdf2f0 | #3d6e3c | #f0f7ee | #8f5c0f | #fdf6e8 |
+| Terracotta | dark | #1c1613 | #f1e8db | #262019 | #332b23 | #a89b8b | #4a3f35 | #756b60 | #e07b55 | #2b1711 | #c2c768 | #23240a | #ea8a64 | #f27d95 | #2e0f0e | #79b07e | #0f2612 | #e0a94a | #2a1b05 |
+| Midnight | light | #f2f6f9 | #041b2f | #fafcfd | #dde8ef | #455f77 | #bccbd6 | #7d8f9d | #006a7e | #f0fbfc | #577600 | #f7faef | #00869c | #be2132 | #fff6f5 | #007840 | #f2fbf5 | #975800 | #fef8ed |
+| Midnight | dark | #06132a | #e2edf2 | #071c2f | #112c42 | #90a9b9 | #263b4d | #596b7a | #38c3d2 | #01151b | #a9d64a | #121904 | #5fdbe8 | #fd7e82 | #230708 | #56db8f | #021709 | #fab549 | #231200 |
+| Harbour | light | #f4f8fb | #15252f | #fbfdfe | #dde7ee | #4d6273 | #c6d4de | #81909a | #205a9a | #f4f9fc | #0f7a6c | #f2faf8 | #2e6fb5 | #b42d3a | #fdf4f4 | #2c7836 | #f1faf5 | #8a5a0e | #fdf7ec |
+| Harbour | dark | #0d1a24 | #e4edf3 | #15252f | #1f333f | #9bb0bf | #2f4656 | #5e717f | #6facea | #0b1b27 | #4fc3ae | #06201a | #86bdf0 | #f08c92 | #2a0b0e | #74d27f | #06271a | #e8b45c | #2b1d05 |
+| Citrus | light | #fff8ec | #3b1f42 | #fffcf5 | #f7e8cc | #6e5473 | #e8d5b4 | #a18a85 | #a84e00 | #fffaf0 | #7a3fb0 | #f8f3ff | #cf5f08 | #bb2449 | #fff5f0 | #33791f | #f3fbe9 | #855f00 | #fff8e1 |
+| Citrus | dark | #1a1120 | #f6ecdc | #251a2b | #332539 | #b9a6bf | #3f3046 | #746772 | #f0954f | #2a1430 | #c49bf0 | #24103a | #f6a85e | #f5788f | #2d0f0c | #86d06a | #15260c | #f5cc4f | #2e2000 |
+| Gallery | light | #f9f8f5 | #1c1b18 | #fefdfb | #e9e6df | #625f58 | #dad7d0 | #908e88 | #141311 | #f9f8f5 | #1446a0 | #f9f8f5 | #1446a0 | #b4281e | #fdf6f4 | #3d6b2c | #f4f8ef | #8c5a0c | #fdf7ec |
+| Gallery | dark | #141311 | #ece9e3 | #1c1b18 | #2a2825 | #a39f96 | #353330 | #6a6864 | #f0ede7 | #141311 | #6190f2 | #141311 | #6f9af7 | #ee7f6e | #1d0e0b | #8dc283 | #121a0c | #e3a84e | #1e1507 |
+| Dusk | light | #f8f4f5 | #2b2229 | #fdfafb | #eae1e5 | #6a5a63 | #d9ccd2 | #958a90 | #7a4a6a | #fdf7f6 | #c4724a | #2c1710 | #8e5a7f | #b23f45 | #fdf7f6 | #3f7355 | #fdf7f6 | #93601e | #fdf7f6 |
+| Dusk | dark | #1a1418 | #f1e8ec | #241c22 | #322730 | #ab9ba3 | #3d313a | #73686f | #cf9bbb | #2a1a24 | #e8ab86 | #2c1a12 | #d9a8c8 | #e2868a | #2a1214 | #8fbf9d | #122018 | #e6b84f | #2a1d0a |
+| Brass | light | #f6f1e7 | #1e1b17 | #fcfaf5 | #ebe3d3 | #675d50 | #d5cab5 | #91897b | #7a5c10 | #fbf6ea | #1c4a3a | #eef3ee | #9c7620 | #9c1f38 | #fcf1ee | #3d6b2a | #eef5ee | #9a4a0c | #fff3e6 |
+| Brass | dark | #141210 | #ede6d6 | #1e1a16 | #2b2620 | #a89e8c | #3a332a | #6e675c | #c9a650 | #1a1610 | #5aa58c | #0f1a15 | #d9b865 | #e8707a | #2a1210 | #86bb84 | #0f1f14 | #f0862e | #2a1a08 |
+
+| Theme | Heading / body font | Radius sm / md / lg | Card shadow |
+|---|---|---|---|
+| Birch | Bricolage Grotesque / Figtree | 8px / 12px / 16px | soft |
+| Paper & Ink | Fraunces / Source Serif 4 | 2px / 4px / 6px | none |
+| Pewter | Instrument Sans / Public Sans | 2px / 4px / 6px | none |
+| Forest | Lora / Work Sans | 4px / 8px / 12px | soft |
+| Terracotta | Fraunces / Nunito Sans | 6px / 10px / 16px | soft |
+| Midnight | IBM Plex Mono / IBM Plex Sans | 4px / 6px / 10px | none |
+| Harbour | Libre Franklin / Source Sans 3 | 4px / 6px / 10px | soft |
+| Citrus | Red Hat Display / Red Hat Text | 8px / 12px / 20px | soft |
+| Gallery | Archivo / Archivo | 0px / 2px / 4px | none |
+| Dusk | Bodoni Moda / Albert Sans | 10px / 14px / 20px | soft |
+| Brass | Cormorant Garamond / Jost | 0px / 2px / 4px | none |
+
+Wiring without the reference: put the light row in `:root` and the dark row in `.dark` as `--background: …;` custom properties, add `--font-heading`, `--font-body`, `--radius-sm/md/lg` and `--shadow-card`, map them once in Tailwind v4 with `@theme inline { --color-background: var(--background); … }` plus `@custom-variant dark (&:where(.dark, .dark *));`, and set the `.dark` class on `<html>` from a blocking inline script in `<head>` (Next.js: `<html suppressHydrationWarning>`). Focus: `outline: 2px solid var(--ring); outline-offset: 2px`.
+
+Inline contrast check when `scripts/check-contrast.js` is missing (same hard rules: text pairs 4.5:1, UI pairs 3:1; `tokens.json` is `{"light": {...}, "dark": {...}}` with camelCase keys):
+
+```bash
+node -e 'const t=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const L=h=>{const n=parseInt(h.slice(1),16);return[16,8,0].map(s=>{let c=((n>>s)&255)/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4}).reduce((a,c,i)=>a+c*[.2126,.7152,.0722][i],0)};const R=(a,b)=>{const x=L(a),y=L(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};const P=[["foreground","background",4.5],["foreground","surface",4.5],["foreground","muted",4.5],["mutedForeground","background",4.5],["mutedForeground","surface",4.5],["mutedForeground","muted",4.5],["primaryForeground","primary",4.5],["accentForeground","accent",4.5],["dangerForeground","danger",4.5],["successForeground","success",4.5],["warningForeground","warning",4.5],["primary","background",4.5],["primary","surface",4.5],["danger","background",4.5],["danger","surface",4.5],["success","background",4.5],["warning","background",4.5],["accent","background",3],["ring","background",3],["ring","surface",3],["ring","muted",3],["input","surface",3],["input","background",3]];let ok=true;for(const m of ["light","dark"])if(t[m])for(const[f,b,q]of P){if(!t[m][f]||!t[m][b])continue;const r=R(t[m][f],t[m][b]);if(r<q){ok=false;console.log(m,f,"on",b,r.toFixed(2),"<",q)}}console.log(ok?"PASS":"FAIL");process.exit(ok?0:1)' tokens.json
+```

@@ -1,8 +1,8 @@
 # front-end-skill-claude-code
 
-A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
+An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and any other agent that reads `SKILL.md`. It turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, pick a contrast-checked colour theme, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
 
-**Version:** 3.1.0 · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
+**Version:** 3.1.0 · **Licence:** MIT · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
 
 ---
 
@@ -25,6 +25,7 @@ A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a 
 - [Related skills](#related-skills)
 - [Limitations](#limitations)
 - [Validation Status](#validation-status)
+- [License](#license)
 - [Changelog](#changelog)
 
 ---
@@ -60,30 +61,41 @@ A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a 
 
 ## Installation
 
-The skill is the `create-frontend/` folder:
+The skill is the `create-frontend/` folder, in the standard Agent Skills layout:
 
 ```
 create-frontend/
-  SKILL.md                    the workflow
-  references/themes.md        ten colour themes with light and dark tokens, fonts and shape
-  scripts/check-contrast.js   WCAG contrast checker for a token file (Node, no dependencies)
+  SKILL.md                    the workflow (self-sufficient: an appendix carries the theme tokens in compact form)
+  references/themes.md        eleven colour themes with light and dark tokens, fonts, shape and wiring
+  scripts/check-contrast.js   WCAG contrast checker for a token file (Node 18+, no dependencies)
+  scripts/scaffold.sh         non-interactive scaffolds for Vite+React, Next.js, Astro, Vue, Svelte, plain HTML
+  scripts/install.sh          installs or updates the skill for your agent(s)
 ```
 
-| Scope | Copy to |
-|---|---|
-| One project (shared through the repo) | `<project>/.claude/skills/create-frontend/` |
-| All your projects | `~/.claude/skills/create-frontend/` |
+Clone once, then install for the agent(s) you use. The installer symlinks the folder by default, so `git pull` in the clone updates every install; pass `--copy` if your agent cannot follow symlinks.
 
 ```bash
-# all projects
-mkdir -p ~/.claude/skills && cp -r create-frontend ~/.claude/skills/
+git clone https://github.com/vardhan23v/front-end-skill-claude-code.git
 ```
 
-If you saved the skill from a review card in Claude, it is already on your account.
+```bash
+front-end-skill-claude-code/create-frontend/scripts/install.sh agents claude
+```
+
+| Agent | User-level directory | Project-level directory |
+|---|---|---|
+| Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and other clients that scan the shared convention | `~/.agents/skills/` (`install.sh agents`) | `.agents/skills/` (`install.sh --project agents`) |
+| Claude Code | `~/.claude/skills/` (`install.sh claude`) | `.claude/skills/` (`install.sh --project claude`) |
+| GitHub Copilot in VS Code (native location) | `~/.copilot/skills/` (`install.sh copilot`) | `.github/skills/` (`install.sh --project copilot`) |
+| Anything else | `install.sh <path your agent documents>` | same, with `--project` |
+
+Which directories a client scans is documented in the [Agent Skills implementor guide](https://agentskills.io/client-implementation/adding-skills-support); the `.agents/skills/` convention is the one most clients share, and Claude Code is the notable exception.
+
+If you copy only `SKILL.md` somewhere (for example into a hosted skill store that accepts a single file), the skill still works: step 6 falls back to the appendix for theme tokens and to an inline contrast check, and step 3 falls back to the plain scaffold commands. You lose the full reference, the per-theme wiring notes and the helper scripts, so prefer the folder.
 
 ## Usage
 
-Claude loads the skill when a request matches its description. You can also call it by name:
+Your agent loads the skill when a request matches its description. Most agents also let you invoke it by name (`/create-frontend` in Claude Code and Codex, `$create-frontend` or a mention in others):
 
 ```
 /create-frontend
@@ -145,7 +157,7 @@ Priority, highest first: explicit user requirements → existing project archite
 
 ## Colour themes
 
-Most generated frontends look the same: white page, grey text, indigo buttons, Inter. This skill does not start there. Step 6 makes Claude choose a palette on purpose, name it in the plan and the report, and build only with tokens.
+Most generated frontends look the same: white page, grey text, indigo buttons, Inter. This skill does not start there. Step 6 makes the agent choose a palette on purpose, name it in the plan and the report, and build only with tokens.
 
 | Situation | What happens |
 |---|---|
@@ -155,24 +167,27 @@ Most generated frontends look the same: white page, grey text, indigo buttons, I
 
 | Theme | Picked for | Character |
 |---|---|---|
-| Paper & Ink | Blogs, documentation, newsletters, long-form reading | Warm paper, ink text, one restrained accent, serif headings |
-| Slate | SaaS dashboards, admin panels, internal tools | Cool quiet neutrals so data carries the colour; petrol primary |
-| Forest | Sustainability, outdoors, food, wellness, non-profits | Deep green, cream, moss |
-| Terracotta | Restaurants, hospitality, crafts, travel, local businesses | Clay primary on warm sand |
-| Midnight | Developer tools, infrastructure, fintech, security | Dark-first: ink background, electric accent; light mode still designed |
-| Harbor | Healthcare, insurance, government, civic, schools, consumer banking | Calm sea blue, maximal legibility |
-| Citrus | Consumer apps, students, events, community, playful marketing | Marigold primary with a plum foreground |
-| Gallery | Portfolios, photography, architecture, fashion, agencies | Near-monochrome, white space, one signal accent |
-| Dusk | Creative tools, beauty, lifestyle, music, journaling | Muted mauve, apricot accent, soft warm greys |
-| Brass | Luxury, wealth, law, premium services | Charcoal, ivory, antique gold; sharp corners |
+| Birch | Product landing pages, SaaS marketing, startup homepages, mainstream e-commerce | Near-white canvas for screenshots and photos, one emerald action, coral promo accent |
+| Paper & Ink | Blogs, help centres, handbooks, newsletters, long-form reading | Warm paper, ink text, fountain-pen-blue links, one vermilion highlight, two serifs |
+| Pewter | SaaS dashboards, admin panels, internal tools (light-first) | Cool quiet neutrals so data carries the colour; deep petrol primary, plum highlight |
+| Forest | Farming, food production, outdoors, nutrition, climate, non-profits | Sage paper, conifer green, ochre |
+| Terracotta | Restaurants, bars, hotels, travel, crafts, local businesses | Clay primary on warm sand, olive-glaze accent |
+| Midnight | Developer tools, infrastructure, developer docs, trading, security (dark-first) | Ink-navy background, cyan and lime at restrained lightness, monospace headings |
+| Harbour | Healthcare, insurance, government, civic, schools and universities, consumer fintech | Institutional sea blue, maximal legibility |
+| Citrus | Upbeat consumer apps, student-facing learning apps, events, clubs, recipe and delivery apps | Tangerine actions, aubergine ink, grape accent |
+| Gallery | Portfolios, photography, architecture, fashion, agencies, museums | White-cube monochrome, ink buttons, one cobalt signal |
+| Dusk | Creative tools, beauty, lifestyle, music, meditation, sleep, journaling | Muted mauve, apricot accent, Didone headings |
+| Brass | Luxury, wealth, law, premium services | Charcoal, ivory, antique gold, bottle green; sharp corners |
 
 Every theme in [`create-frontend/references/themes.md`](create-frontend/references/themes.md) ships:
 
-- light and dark token sets (`background`, `foreground`, `surface`, `muted`, `border`, `primary`, `accent`, `ring`, `danger`, `success`, `warning`, each with its `-foreground`) as ready-to-paste `:root` and `.dark` blocks
-- a font pairing, a corner radius scale and a card shadow that match the mood
-- contrast figures produced by [`scripts/check-contrast.js`](create-frontend/scripts/check-contrast.js): every text pair at least 4.5:1 and every UI pair at least 3:1, in both modes
+- light and dark token sets (`background`, `foreground`, `surface`, `muted`, `border`, `input`, `primary`, `accent`, `ring`, `danger`, `success`, `warning`, each with its `-foreground` where text sits on it) as ready-to-paste `:root` and `.dark` blocks, with fonts, radii and per-mode card and popover shadows
+- a font pairing that no other theme uses, a corner radius scale and a shadow character that match the mood
+- contrast figures produced by [`scripts/check-contrast.js`](create-frontend/scripts/check-contrast.js): every text pair at least 4.5:1 and every UI pair at least 3:1, in both modes, plus notes on tokens that are fill-only
 
-The checker is also what the skill runs when it derives a theme from a brand colour or edits any value:
+The reference also carries the wiring: the Tailwind v4 `@theme inline` mapping, focus rings with an offset (so they show on primary buttons), `color-mix` recipes for hover and selection instead of extra tokens, and a dark-mode setup that does not flash: a blocking inline script in `<head>` sets the `.dark` class before first paint, `color-scheme` follows the class, and Next.js gets `suppressHydrationWarning` on `<html>`.
+
+The checker is also what the skill runs when it derives a theme from a brand colour or edits any value. It fails on any text pair under 4.5:1 or UI pair under 3:1, and warns about OKLCH hue collisions (primary vs danger, accent vs warning, …), status colours used as text on muted fills, indigo-band primaries and inverted dark modes:
 
 ```bash
 node create-frontend/scripts/check-contrast.js tokens.json
@@ -254,7 +269,7 @@ Edit `create-frontend/SKILL.md` unless the table says otherwise:
 | To change | Edit |
 |---|---|
 | Default framework, styling or test stack | The decision table in step 3 |
-| Team constraints the skill must respect | Add them to `CLAUDE.md`; the skill reads it in step 1 and ranks it above its own defaults |
+| Team constraints the skill must respect | Add them to `AGENTS.md` or `CLAUDE.md`; the skill reads them in step 1 and ranks them above its own defaults |
 | Which theme a project type gets | The project → theme table in step 6 |
 | Add or change a colour theme | `create-frontend/references/themes.md`; run `node create-frontend/scripts/check-contrast.js` on the new values until it exits 0 |
 | Your company's palette as the only theme | Replace the library with one theme derived from your brand and delete the project → theme table |
@@ -268,7 +283,7 @@ Edit `create-frontend/SKILL.md` unless the table says otherwise:
 
 | Skill | Role |
 |---|---|
-| `frontend-design` | Visual direction (aesthetic, typography, avoiding templated defaults). `create-frontend` delegates to it in step 6 when the look matters rather than duplicating it. |
+| A visual-design skill such as `frontend-design` | Optional. If one is installed alongside, step 6 loads it for art direction when the look matters more than usual. Nothing depends on it: the theme library, shape and font choices, and the "avoid the generic AI look" rules are the visual direction when no such skill exists. |
 
 ## Limitations
 
@@ -276,7 +291,7 @@ Edit `create-frontend/SKILL.md` unless the table says otherwise:
 - Backend work is identified and contracted, not implemented.
 - Browser, visual and accessibility verification depend on a browser tool or Playwright being available in the session; without them those categories are reported as not verified.
 - Scaffold commands and tool invocations (`create-vite`, `create-next-app`, `create-astro`, `sv create`, Playwright, axe, Lighthouse) are current major-version syntax and will drift; the skill is told to read current docs when a command fails.
-- The skill reads `CLAUDE.md` and lint config for team constraints; constraints that live only in people's heads must be stated in the request.
+- The skill reads `AGENTS.md`, `CLAUDE.md` and lint config for team constraints; constraints that live only in people's heads must be stated in the request.
 - Design judgement is bounded: the skill avoids the generic AI look and follows supplied references, but does not replace a designer.
 - The themes are starting palettes with verified contrast, not brand systems. A theme derived from a brand colour is only as accessible as the adjusted colour; the checker reports it, the skill must act on it.
 - `check-contrast.js` checks token pairs, not rendered pages: text over images, gradients or overlapping surfaces still needs the axe scan.
@@ -289,10 +304,10 @@ Be aware of this before relying on the skill.
 
 **Verification performed on 3.1.0 (6 Oct 2026):**
 
-- Each of the ten themes was designed by an independent agent, re-verified by a second agent, and critiqued as a set for overlap, coverage and practicality before being written
-- `node create-frontend/scripts/check-contrast.js` exits 0 for every theme in both modes; the contrast figures in `references/themes.md` are generated from that run, not typed
-- `check-contrast.js` runs on Node 18+ with no dependencies and accepts a light-only or dark-only file
-- The themes have not yet been used in a real build driven by the skill; font pairings are checked by name against Google Fonts, not rendered
+- Ten themes were designed by independent agents, each re-verified by a second agent with the checker, then critiqued as a set through three lenses (overlap, coverage, practicality). The critique produced the eleventh theme (Birch), two renames (Slate → Pewter, Harbor → Harbour), a primary swap for Paper & Ink, unique font pairings, the `input` token, per-mode shadows, the focus-ring offset and the hue-collision warnings in the checker
+- `node create-frontend/scripts/check-contrast.js` exits 0 for every theme in both modes; the contrast figures in `references/themes.md` and the appendix in `SKILL.md` are generated from that run, not typed
+- `check-contrast.js` runs on Node 18+ with no dependencies and accepts a light-only or dark-only file; `install.sh` and `scaffold.sh` were run once each on macOS
+- Not yet done: a real build driven by the skill with one of the themes; rendering the font pairings (checked by name against Google Fonts only); `scaffold.sh` for `next`, `astro`, `vue` and `svelte` end to end (flags are current as of October 2026 and will drift)
 
 **Verification performed on 3.0.0 (4 Oct 2026, in a sandbox):**
 
@@ -319,6 +334,10 @@ Be aware of this before relying on the skill.
 6. A session with no browser tooling: confirm the `BROWSER VERIFICATION: NOT AVAILABLE` block and manual steps appear
 
 Recommended real projects to use: a personal portfolio (plain HTML or Astro), a small admin dashboard on Vite + React against a public demo API, an existing Next.js starter with a few pages, and one deliberately abandoned side project.
+
+## License
+
+[MIT](LICENSE). Use it, fork it, ship it inside your own agent or plugin; attribution stays in the file.
 
 ## Changelog
 
