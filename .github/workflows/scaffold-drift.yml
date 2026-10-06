@@ -1,0 +1,42 @@
+name: Scaffold drift
+
+# scripts/scaffold.sh pins the non-interactive flags of each scaffolder as of October 2026. Those flags
+# drift between major versions, so once a month (and on demand) this actually runs every branch with
+# network access and builds the result. A failure here means the flags need updating, not the skill.
+on:
+  schedule:
+    - cron: '17 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scaffold:
+    name: ${{ matrix.kind }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [vite-react, next, astro, vue, svelte]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      ASTRO_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Scaffold
+        run: sh create-frontend/scripts/scaffold.sh "${{ matrix.kind }}" "$RUNNER_TEMP/app" < /dev/null
+
+      - name: Build
+        working-directory: ${{ runner.temp }}/app
+        run: |
+          set -eu
+          test -f package.json
+          [ -d node_modules ] || npm install
+          npm run build

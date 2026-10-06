@@ -1,5 +1,7 @@
 # create-frontend-skill
 
+[![CI](https://github.com/vardhan23v/create-frontend-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/vardhan23v/create-frontend-skill/actions/workflows/ci.yml) [![Scaffold drift](https://github.com/vardhan23v/create-frontend-skill/actions/workflows/scaffold-drift.yml/badge.svg)](https://github.com/vardhan23v/create-frontend-skill/actions/workflows/scaffold-drift.yml)
+
 An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and any other agent that reads `SKILL.md`. It turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, pick a contrast-checked colour theme, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
 
 **Version:** 3.1.0 · **Licence:** MIT · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
@@ -334,6 +336,20 @@ Be aware of this before relying on the skill.
 6. A session with no browser tooling: confirm the `BROWSER VERIFICATION: NOT AVAILABLE` block and manual steps appear
 
 Recommended real projects to use: a personal portfolio (plain HTML or Astro), a small admin dashboard on Vite + React against a public demo API, an existing Next.js starter with a few pages, and one deliberately abandoned side project.
+
+## Development
+
+Three GitHub Actions workflows keep the repo honest:
+
+| Workflow | Runs | Checks |
+|---|---|---|
+| [CI](.github/workflows/ci.yml) | every push and pull request, Node 18 and 22 | `SKILL.md` frontmatter follows the Agent Skills spec; every theme passes `check-contrast.js`; the appendix in `SKILL.md` matches `references/themes.md` value for value; theme tables and relative links resolve; `CHANGELOG.md` has the current version; shell scripts pass shellcheck; `scaffold.sh html` and `install.sh` (symlink, copy, project, refusal) behave |
+| [Release](.github/workflows/release.yml) | on a `v*` tag | tag equals `metadata.version`, then publishes a release with `create-frontend/` zipped and the matching CHANGELOG section as notes |
+| [Scaffold drift](.github/workflows/scaffold-drift.yml) | monthly and on demand | runs `scaffold.sh` for Vite + React, Next.js, Astro, Vue and Svelte with network access and builds each result, so flag drift shows up as a red badge rather than a broken session |
+
+Run the CI checks locally with `node .github/scripts/validate-skill.js`. To cut a release: bump `metadata.version` in `SKILL.md`, add the CHANGELOG entry, then `git tag v3.1.0 && git push --tags`.
+
+Editing a theme: change the values in `references/themes.md`, run the checker on them, and update the matching appendix rows in `SKILL.md`; CI fails if the two disagree.
 
 ## License
 

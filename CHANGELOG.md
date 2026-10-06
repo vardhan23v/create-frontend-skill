@@ -15,6 +15,7 @@ Colour themes, and the skill becomes an agent-agnostic, open-source Agent Skill.
 - `SKILL.md` appendix: the theme tokens in compact form and an inline contrast check, so a single-file install still works
 - Verification report: `Theme:` line in PROJECT; definition of done: theme named and contrast checked in every shipped mode
 - README: Colour themes section, multi-agent install table, licence
+- GitHub Actions: CI (spec frontmatter, theme contrast, appendix sync, links, shellcheck, script behaviour), Release on `v*` tags (zip + notes from this file), monthly Scaffold drift run; Dependabot for action versions
 
 ### Changed
 - Token set: `surface`, `input`, `accent`, `ring`, `warning` and the `-foreground` pairs added

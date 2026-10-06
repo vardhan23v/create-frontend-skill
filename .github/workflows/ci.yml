@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Frontmatter, themes, appendix sync, tables, links
+        run: node .github/scripts/validate-skill.js
+
+      - name: Contrast checker accepts a light-only file and rejects a failing pair
+        run: |
+          set -eu
+          cat > "$RUNNER_TEMP/light.json" <<'EOF'
+          {"light":{"background":"#fafaf7","foreground":"#16181a","surface":"#fefefc","muted":"#eeede8","mutedForeground":"#5b5f64","border":"#d8d7d0","input":"#90908d","primary":"#0e7a50","primaryForeground":"#effbf4","accent":"#b8431a","accentForeground":"#fff6f0","ring":"#15996a","danger":"#b01f45","dangerForeground":"#fdf2f4","success":"#4a7a12","successForeground":"#eefaf1","warning":"#8c5a0a","warningForeground":"#fdf6e8"}}
+          EOF
+          node create-frontend/scripts/check-contrast.js "$RUNNER_TEMP/light.json" > /dev/null
+          sed 's/"primary":"#0e7a50"/"primary":"#9ad5b8"/' "$RUNNER_TEMP/light.json" > "$RUNNER_TEMP/bad.json"
+          if node create-frontend/scripts/check-contrast.js "$RUNNER_TEMP/bad.json" > /dev/null; then
+            echo "checker exited 0 on a failing palette" >&2; exit 1
+          fi
+
+  scripts:
+    name: shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck and syntax
+        run: |
+          set -eu
+          shellcheck --shell=sh create-frontend/scripts/*.sh
+          for f in create-frontend/scripts/*.sh; do sh -n "$f"; done
+          test -x create-frontend/scripts/install.sh
+          test -x create-frontend/scripts/scaffold.sh
+          test -x create-frontend/scripts/check-contrast.js
+
+      - name: scaffold.sh html
+        run: |
+          set -eu
+          sh create-frontend/scripts/scaffold.sh html "$RUNNER_TEMP/site"
+          test -f "$RUNNER_TEMP/site/index.html"
+          test -f "$RUNNER_TEMP/site/styles.css"
+          grep -q 'name="viewport"' "$RUNNER_TEMP/site/index.html"
+          if sh create-frontend/scripts/scaffold.sh html "$RUNNER_TEMP/site" 2> /dev/null; then
+            echo "scaffold.sh overwrote an existing directory" >&2; exit 1
+          fi
+
+      - name: install.sh (symlink, copy, project, refusal)
+        env:
+          HOME: ${{ runner.temp }}/home
+        run: |
+          set -eu
+          mkdir -p "$HOME"
+          sh create-frontend/scripts/install.sh agents claude
+          test -L "$HOME/.agents/skills/create-frontend"
+          test -f "$HOME/.claude/skills/create-frontend/SKILL.md"
+          sh create-frontend/scripts/install.sh --copy claude
+          test ! -L "$HOME/.claude/skills/create-frontend"
+          test -f "$HOME/.claude/skills/create-frontend/references/themes.md"
+          ( cd "$RUNNER_TEMP" && mkdir -p proj && cd proj && sh "$GITHUB_WORKSPACE/create-frontend/scripts/install.sh" --project agents && test -L .agents/skills/create-frontend )
+          mkdir -p "$HOME/.other/skills/create-frontend" && echo "not ours" > "$HOME/.other/skills/create-frontend/SKILL.md"
+          if sh create-frontend/scripts/install.sh "$HOME/.other/skills" 2> /dev/null; then
+            echo "install.sh replaced a directory that is not a create-frontend install" >&2; exit 1
+          fi
