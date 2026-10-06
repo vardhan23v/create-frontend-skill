@@ -308,8 +308,11 @@ Be aware of this before relying on the skill.
 
 - Ten themes were designed by independent agents, each re-verified by a second agent with the checker, then critiqued as a set through three lenses (overlap, coverage, practicality). The critique produced the eleventh theme (Birch), two renames (Slate → Pewter, Harbor → Harbour), a primary swap for Paper & Ink, unique font pairings, the `input` token, per-mode shadows, the focus-ring offset and the hue-collision warnings in the checker
 - `node create-frontend/scripts/check-contrast.js` exits 0 for every theme in both modes; the contrast figures in `references/themes.md` and the appendix in `SKILL.md` are generated from that run, not typed
-- `check-contrast.js` runs on Node 18+ with no dependencies and accepts a light-only or dark-only file; `install.sh` and `scaffold.sh` were run once each on macOS
-- Not yet done: a real build driven by the skill with one of the themes; rendering the font pairings (checked by name against Google Fonts only); `scaffold.sh` for `next`, `astro`, `vue` and `svelte` end to end (flags are current as of October 2026 and will drift)
+- `check-contrast.js` runs on Node 18+ with no dependencies and accepts a light-only or dark-only file; CI runs it on every theme and on a deliberately failing palette
+- `install.sh` is exercised in CI for symlink, copy, project scope, a path with spaces, re-running over a copy, refusing a foreign directory and refusing to run from inside an installed copy
+- `scaffold.sh` scaffolded and built all five stacks (Vite + React, Next.js, Astro, Vue, Svelte) in the Scaffold drift workflow on 6 Oct 2026, and `vite-react` and `vue` were also run locally; the flags will still drift, which is what the monthly run is for
+- A release-review pass (three reviewers, each must-fix independently re-verified) found and fixed: `--shadow-card: none` cancelling Tailwind focus rings, wrong dark-only instructions, Astro needing `is:inline`, `next-themes` needing `attribute="class"`, an installer that could delete itself, path targets split on spaces, and stale hex values in one theme's notes
+- Not yet done: a real build driven by the skill with one of the themes; rendering the font pairings (checked by name against Google Fonts only)
 
 **Verification performed on 3.0.0 (4 Oct 2026, in a sandbox):**
 
