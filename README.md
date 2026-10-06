@@ -2,7 +2,7 @@
 
 A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
 
-**Version:** 3.0.0 · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
+**Version:** 3.1.0 · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
 
 ---
 
@@ -14,6 +14,7 @@ A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a 
 - [Usage](#usage)
 - [Workflow](#workflow)
 - [Stack decisions](#stack-decisions)
+- [Colour themes](#colour-themes)
 - [When backend work is required](#when-backend-work-is-required)
 - [Testing expectations](#testing-expectations)
 - [Verification levels](#verification-levels)
@@ -36,7 +37,7 @@ A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a 
 | Read | Inspects `package.json`, lockfile, config, routing, styling, components, data layer, tests and environment; runs the existing checks once and records what already fails |
 | Decide | Chooses the stack by a fixed priority (user → existing architecture → conventions → team constraints → requirements → defaults) |
 | Boundary | Detects features that need a backend, writes the API contract, and refuses to fake them |
-| Build | Design tokens first, then screens with loading/empty/error/success states, responsive layout, accessibility, forms, security |
+| Build | A named colour theme (from the library, or derived from the brand) and design tokens first, then screens with loading/empty/error/success states, responsive layout, accessibility, forms, security |
 | Verify | Code, types, build, tests, browser, visual, accessibility, each reported separately and never fabricated |
 | Recover | Diagnose → root cause → fix → re-verify, with a retry limit and explicit blocker handling |
 | Deploy prep | Build command, output directory, SPA fallback, env variables (public vs private), Node version, risks; deploys only on request |
@@ -59,12 +60,19 @@ A Claude Code skill (`create-frontend`) that turns "build me a frontend" into a 
 
 ## Installation
 
-The skill is one file: `create-frontend/SKILL.md`.
+The skill is the `create-frontend/` folder:
+
+```
+create-frontend/
+  SKILL.md                    the workflow
+  references/themes.md        ten colour themes with light and dark tokens, fonts and shape
+  scripts/check-contrast.js   WCAG contrast checker for a token file (Node, no dependencies)
+```
 
 | Scope | Copy to |
 |---|---|
-| One project (shared through the repo) | `<project>/.claude/skills/create-frontend/SKILL.md` |
-| All your projects | `~/.claude/skills/create-frontend/SKILL.md` |
+| One project (shared through the repo) | `<project>/.claude/skills/create-frontend/` |
+| All your projects | `~/.claude/skills/create-frontend/` |
 
 ```bash
 # all projects
@@ -135,6 +143,43 @@ Priority, highest first: explicit user requirements → existing project archite
 | Testing | Vitest + Testing Library; Playwright e2e | Plain HTML → Playwright smoke only |
 | Build tooling | The framework's own | — |
 
+## Colour themes
+
+Most generated frontends look the same: white page, grey text, indigo buttons, Inter. This skill does not start there. Step 6 makes Claude choose a palette on purpose, name it in the plan and the report, and build only with tokens.
+
+| Situation | What happens |
+|---|---|
+| The project already has tokens, a theme file or a component library | They are used; no second palette is added |
+| Brand colours, a logo or a design file are supplied | The closest theme is taken as a base, `primary` and `ring` are replaced by the brand colour (adjusted until it passes contrast), neutrals are tinted toward the brand's temperature |
+| Nothing is supplied | A theme is picked by project type from the table below, and the choice is stated |
+
+| Theme | Picked for | Character |
+|---|---|---|
+| Paper & Ink | Blogs, documentation, newsletters, long-form reading | Warm paper, ink text, one restrained accent, serif headings |
+| Slate | SaaS dashboards, admin panels, internal tools | Cool quiet neutrals so data carries the colour; petrol primary |
+| Forest | Sustainability, outdoors, food, wellness, non-profits | Deep green, cream, moss |
+| Terracotta | Restaurants, hospitality, crafts, travel, local businesses | Clay primary on warm sand |
+| Midnight | Developer tools, infrastructure, fintech, security | Dark-first: ink background, electric accent; light mode still designed |
+| Harbor | Healthcare, insurance, government, civic, schools, consumer banking | Calm sea blue, maximal legibility |
+| Citrus | Consumer apps, students, events, community, playful marketing | Marigold primary with a plum foreground |
+| Gallery | Portfolios, photography, architecture, fashion, agencies | Near-monochrome, white space, one signal accent |
+| Dusk | Creative tools, beauty, lifestyle, music, journaling | Muted mauve, apricot accent, soft warm greys |
+| Brass | Luxury, wealth, law, premium services | Charcoal, ivory, antique gold; sharp corners |
+
+Every theme in [`create-frontend/references/themes.md`](create-frontend/references/themes.md) ships:
+
+- light and dark token sets (`background`, `foreground`, `surface`, `muted`, `border`, `primary`, `accent`, `ring`, `danger`, `success`, `warning`, each with its `-foreground`) as ready-to-paste `:root` and `.dark` blocks
+- a font pairing, a corner radius scale and a card shadow that match the mood
+- contrast figures produced by [`scripts/check-contrast.js`](create-frontend/scripts/check-contrast.js): every text pair at least 4.5:1 and every UI pair at least 3:1, in both modes
+
+The checker is also what the skill runs when it derives a theme from a brand colour or edits any value:
+
+```bash
+node create-frontend/scripts/check-contrast.js tokens.json
+```
+
+Dark mode is not an inversion of light: backgrounds are the darkest value, surfaces are lifted, primaries are lightened, and text is off-white. Light and dark both ship only when the project or user wants them; otherwise one mode is kept and the other block deleted.
+
 ## When backend work is required
 
 The skill is frontend-only but detects these triggers: authentication and sessions, roles and permissions, database persistence, server-side validation, private API or service-role keys, file uploads to storage, payments, email or SMS, server-side processing, scheduling or webhooks, and anything other users must see after a reload.
@@ -191,7 +236,7 @@ When blocked by missing credentials, an unavailable service or tool, or a decisi
 Every run ends with:
 
 ```
-PROJECT            framework, language, styling, testing, build tool
+PROJECT            framework, language, styling, theme, testing, build tool
 IMPLEMENTED        what was built
 VERIFIED           code, types, build, tests, browser, visual, accessibility — each with its result
 NOT VERIFIED       what, why, and the manual command
@@ -204,12 +249,15 @@ DEPLOYMENT NOTES   build command, output, fallback, Node version, risks
 
 ## Customising
 
-Edit `create-frontend/SKILL.md`:
+Edit `create-frontend/SKILL.md` unless the table says otherwise:
 
 | To change | Edit |
 |---|---|
 | Default framework, styling or test stack | The decision table in step 3 |
 | Team constraints the skill must respect | Add them to `CLAUDE.md`; the skill reads it in step 1 and ranks it above its own defaults |
+| Which theme a project type gets | The project → theme table in step 6 |
+| Add or change a colour theme | `create-frontend/references/themes.md`; run `node create-frontend/scripts/check-contrast.js` on the new values until it exits 0 |
+| Your company's palette as the only theme | Replace the library with one theme derived from your brand and delete the project → theme table |
 | Folder layout | Step 5 |
 | Accessibility or browser-support standard | Step 2 defaults and step 7 |
 | A fixed hosting provider | Step 12 |
@@ -230,6 +278,8 @@ Edit `create-frontend/SKILL.md`:
 - Scaffold commands and tool invocations (`create-vite`, `create-next-app`, `create-astro`, `sv create`, Playwright, axe, Lighthouse) are current major-version syntax and will drift; the skill is told to read current docs when a command fails.
 - The skill reads `CLAUDE.md` and lint config for team constraints; constraints that live only in people's heads must be stated in the request.
 - Design judgement is bounded: the skill avoids the generic AI look and follows supplied references, but does not replace a designer.
+- The themes are starting palettes with verified contrast, not brand systems. A theme derived from a brand colour is only as accessible as the adjusted colour; the checker reports it, the skill must act on it.
+- `check-contrast.js` checks token pairs, not rendered pages: text over images, gradients or overlapping surfaces still needs the axe scan.
 
 ## Validation Status
 
@@ -237,7 +287,14 @@ Be aware of this before relying on the skill.
 
 **Tested projects:** none. The skill has not yet driven a build on a real project.
 
-**Verification performed on this version (4 Oct 2026, in a sandbox):**
+**Verification performed on 3.1.0 (6 Oct 2026):**
+
+- Each of the ten themes was designed by an independent agent, re-verified by a second agent, and critiqued as a set for overlap, coverage and practicality before being written
+- `node create-frontend/scripts/check-contrast.js` exits 0 for every theme in both modes; the contrast figures in `references/themes.md` are generated from that run, not typed
+- `check-contrast.js` runs on Node 18+ with no dependencies and accepts a light-only or dark-only file
+- The themes have not yet been used in a real build driven by the skill; font pairings are checked by name against Google Fonts, not rendered
+
+**Verification performed on 3.0.0 (4 Oct 2026, in a sandbox):**
 
 - Frontmatter parses; `name` and `description` present; description under the length limit
 - No "production tested" or similar claims anywhere in the repo

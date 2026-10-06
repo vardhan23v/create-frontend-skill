@@ -1,6 +1,6 @@
 ---
 name: "create-frontend"
-description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy. For visual direction alone, use frontend-design."
+description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, picks a named colour theme from a contrast-checked library (or derives one from the brand), builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy. For visual direction alone, use frontend-design."
 ---
 
 # Create Frontend
@@ -62,7 +62,7 @@ Infer what is safe to infer. Ask one short batch of questions only for items tha
 | SEO | Public site: yes; private app or dashboard: no | Unclear whether it is public |
 | Performance | Core Web Vitals targets (step 8) | Unusual constraints (slow networks, very large data) |
 | Loading, error, empty, success states | Always, on every async view | - |
-| Design references | Use what is supplied; otherwise tokens from step 6 | Brand matters and nothing is supplied |
+| Design references and colour | Use what is supplied; otherwise a named theme from step 6, chosen by project type | Brand matters and nothing is supplied |
 | Motion and 3D | Functional motion only (step 7); no 3D | The user asks for it, or a reference relies on it |
 | Favicon and app icons | Always; from the user's logo or an original mark (step 7) | - |
 | Deploy target, environment variables, integrations | Record what is known | A host or integration forces a framework choice |
@@ -134,17 +134,44 @@ Keep components small and single-purpose. Co-locate a component's styles and tes
 
 ## 6. Design tokens and visual quality
 
-Before building more than a screen or two, define the tokens once and use them everywhere: colours with semantic names (`background`, `foreground`, `primary`, `muted`, `border`, `danger`, `success`), type scale, spacing scale, radii, shadows, breakpoints, and the states each interactive component needs (hover, focus, active, disabled, loading, error).
+Before building more than a screen or two, define the tokens once and use them everywhere: colours with semantic names (`background`, `foreground`, `surface`, `muted`, `border`, `primary`, `accent`, `ring`, `danger`, `success`, `warning`, each with a `-foreground` where text sits on it), type scale, spacing scale, radii, shadows, breakpoints, and the states each interactive component needs (hover, focus, active, disabled, loading, error).
 
 - Put them in CSS custom properties or the Tailwind theme, never as scattered literal values
 - A tiny project gets a short token file, not a design system
-- **Themes**: light and dark only if the project or user wants it, driven by tokens and `prefers-color-scheme`, with a persisted manual toggle. Otherwise build one theme well.
 - **Motion tokens**: two or three durations (about 120, 200 and 320 ms) and two easings (ease-out for entrances, ease-in for exits), defined once; every animation uses them. What may move, and how, is in step 7.
-- **Fonts**: at most two families; `font-display: swap`; self-host or preconnect
+- **Fonts**: at most two families (the chosen theme names a pairing); `font-display: swap`; self-host or preconnect
+
+### Colour theme
+
+Choose the palette deliberately before the first screen, name it in the plan and the report, and never start from a framework default or the white-page-with-indigo-buttons look. `references/themes.md`, next to this file, holds ten named themes; each has light and dark token sets, a font pairing, a shape character, and contrast figures produced by `scripts/check-contrast.js`.
+
+| Situation | Do |
+|---|---|
+| Existing project with tokens, a theme file or a component library | Use them; never add a second palette |
+| Brand colours, a logo or a design file supplied | Derive: take the closest theme by temperature and mood, replace `primary` and `ring` with the brand colour (darken it in light mode and lighten it in dark mode until the checker passes), tint the neutrals toward the brand's temperature, keep the rest |
+| Nothing supplied | Pick by project type from the table below. When two fit, prefer the one the user's references lean toward, and say which you chose and why |
+
+| Project | Theme |
+|---|---|
+| Blog, documentation, newsletter, long-form reading | Paper & Ink |
+| SaaS dashboard, admin panel, internal tool, data-dense UI | Slate |
+| Sustainability, outdoors, food, wellness, non-profit | Forest |
+| Restaurant, café, hospitality, crafts, travel, local business | Terracotta |
+| Developer tool, infrastructure, fintech, security (dark-first) | Midnight |
+| Healthcare, insurance, government, civic, school, consumer banking | Harbor |
+| Consumer app, students, events, community, playful marketing | Citrus |
+| Portfolio, photography, architecture, fashion, agency | Gallery |
+| Creative tool, beauty, lifestyle, music, journaling | Dusk |
+| Luxury, wealth, law, premium services | Brass |
+
+- Copy the theme's `:root` and `.dark` blocks and the wiring from the reference; components use tokens only, never the hex values
+- Light and dark: ship both when the project or user wants them, driven by `prefers-color-scheme` with a persisted manual toggle and `color-scheme` set. Otherwise keep one mode (dark for a dark-first product) and delete the other block.
+- Colour is scarce: `primary` for the one main action per view and for links; `accent` for selected states, badges and highlights; status colours only for status; everything else neutral. A screen that is mostly `background`, `surface` and `foreground` with one `primary` reads as designed; one that uses every token reads as a template.
+- Changed or derived any value? Run `node <skill directory>/scripts/check-contrast.js tokens.json` (text pairs at least 4.5:1, UI pairs 3:1, in every shipped mode) and fix each failing pair before building on it
 
 Avoid the generic AI look: gradient backgrounds everywhere, glassmorphism, random animations, a grid of equally rounded cards, decorative elements that do not aid use, and inconsistent spacing or type sizes between screens. Every screen should look like it belongs to the same product.
 
-When a design or reference is supplied, analyse it first: name the characteristics that matter (layout rhythm, type, colour, density, component shapes), reproduce those, and ignore incidental details. The user's brand colours, fonts or design file are the source of truth.
+When a design or reference is supplied, analyse it first: name the characteristics that matter (layout rhythm, type, colour, density, component shapes), reproduce those, and ignore incidental details. The user's brand colours, fonts or design file are the source of truth; the theme library only fills what they leave open.
 
 If the `frontend-design` skill is available and the look matters, load it for visual direction instead of improvising here.
 
@@ -296,7 +323,7 @@ Seven categories. Run what you can, fix what you find, and report each one hones
 | Build | Production build succeeds; bundle sizes reviewed | `npm run build` (or the manager's equivalent) |
 | Tests | Existing and new tests pass | project `test`; `npx playwright test` |
 | Browser | App runs; routes open; console and network clean; interactions, states, forms and navigation work at desktop and mobile widths | dev or preview server plus a browser tool or Playwright |
-| Visual | Screenshots at 375 and 1280 wide (both themes if two) read by you: layout, spacing and typography consistent; nothing clipped or overflowing; animations and 3D settle as intended, honour reduced motion and show their poster until loaded; the tab icon renders | `npx playwright screenshot --viewport-size=375,812 <url> mobile.png` |
+| Visual | Screenshots at 375 and 1280 wide (light and dark if both ship) read by you: layout, spacing and typography consistent; nothing clipped or overflowing; animations and 3D settle as intended, honour reduced motion and show their poster until loaded; the tab icon renders | `npx playwright screenshot --viewport-size=375,812 <url> mobile.png` |
 | Accessibility | Automated scan plus a keyboard walk | `npx @axe-core/cli <url>` plus manual checks below |
 
 Optional for public sites: `npx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`; report the scores and fix clear failures.
@@ -317,7 +344,7 @@ followed by manual steps the user can run: the command to start the app, the URL
 
 ### Accessibility verification
 
-Semantic HTML existing in the code is not verification. When a browser is available: tab through every page (order logical, focus visible, no traps); Enter and Space activate buttons, Enter activates links; Escape closes dialogs and focus returns to the trigger; arrow keys move within menus and tabs; forms announce labels and errors; zoom to 200% without clipping; reduced motion honoured; touch targets and contrast checked. Run the axe scan and fix serious and critical issues. When no browser is available, report the review as code-level only.
+Semantic HTML existing in the code is not verification. When a browser is available: tab through every page (order logical, focus visible, no traps); Enter and Space activate buttons, Enter activates links; Escape closes dialogs and focus returns to the trigger; arrow keys move within menus and tabs; forms announce labels and errors; zoom to 200% without clipping; reduced motion honoured; touch targets checked; contrast checked twice, the tokens with `scripts/check-contrast.js` and the rendered pages with axe. Run the axe scan and fix serious and critical issues. When no browser is available, report the review as code-level only.
 
 Stop any server you started. Delete screenshots and temporary files unless the user wants them.
 
@@ -366,6 +393,7 @@ PROJECT
 Framework:
 Language:
 Styling:
+Theme: (name from references/themes.md, derived from brand, or existing tokens; modes shipped)
 Testing:
 Build tool:
 
@@ -403,6 +431,7 @@ DEPLOYMENT NOTES
 ## Definition of done
 
 - [ ] Project classified; existing conventions followed, or the stack choice stated with a reason
+- [ ] Colour theme named (existing tokens, derived from brand, or one from the library); contrast checked in every shipped mode
 - [ ] Code, types, build and tests pass (pre-existing failures reported, not hidden)
 - [ ] Browser, visual and accessibility checks run, or reported as not available with manual steps
 - [ ] Loading, empty, error and success states exist on every async view
