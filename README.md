@@ -4,7 +4,7 @@
 
 An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and any other agent that reads `SKILL.md`. It turns "build me a frontend" into a production-oriented workflow: classify the project, respect or choose the stack, draw the frontend/backend boundary, pick a contrast-checked colour theme, build with real states and accessibility, verify in seven explicit categories, and finish with an honest verification report.
 
-**Version:** 3.2.0 · **Licence:** MIT · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
+**Version:** 3.3.0 · **Licence:** MIT · **Status:** specification complete, not yet validated on real projects (see [Validation Status](#validation-status))
 
 ---
 
@@ -18,6 +18,7 @@ An open-source [Agent Skill](https://agentskills.io) (`create-frontend`) for Cla
 - [Stack decisions](#stack-decisions)
 - [Colour themes](#colour-themes)
 - [Motion](#motion)
+- [A new design every time](#a-new-design-every-time)
 - [When backend work is required](#when-backend-work-is-required)
 - [Testing expectations](#testing-expectations)
 - [Verification levels](#verification-levels)
@@ -71,6 +72,8 @@ create-frontend/
   SKILL.md                    the workflow (self-sufficient: an appendix carries the theme tokens in compact form)
   references/themes.md        eleven colour themes with light and dark tokens, fonts, shape and wiring
   references/motion.md        motion tokens, three motion levels and twelve paste-ready animation recipes
+  references/design-directions.md  ten design axes, theme alternates and remix rules, the docs/design.md template
+  scripts/design-direction.js  composes three distinct design directions per project, seeded by its name
   scripts/check-contrast.js   WCAG contrast checker for a token file (Node 18+, no dependencies)
   scripts/scaffold.sh         non-interactive scaffolds for Vite+React, Next.js, Astro, Vue, Svelte, plain HTML
   scripts/install.sh          installs or updates the skill for your agent(s)
@@ -200,6 +203,18 @@ node create-frontend/scripts/check-contrast.js tokens.json
 
 Dark mode is not an inversion of light: backgrounds are the darkest value, surfaces are lifted, primaries are lightened, and text is off-white. Light and dark both ship only when the project or user wants them; otherwise one mode is kept and the other block deleted.
 
+## A new design every time
+
+A theme is a palette, not a design. Left alone, two cafés would both get Terracotta, Fraunces, the same hero and the same card grid. So step 6 composes a **design direction** from ten axes before the first screen: theme (primary or an alternate, with remix rules for fonts, hue and shape), hero archetype (split, statement, editorial, band, showcase, utility), navigation, section rhythm, card character, button shape, type voice and scale, imagery treatment, motion level, density.
+
+[`scripts/design-direction.js`](create-frontend/scripts/design-direction.js) does it mechanically:
+
+```bash
+node create-frontend/scripts/design-direction.js --type cafe --name "Kiln & Bean" --avoid docs/design.md
+```
+
+It is seeded by the project name, so a second project of the same type is different by construction; the three candidates it prints differ on at least four axes, one uses an alternate theme, incoherent combinations are rejected (a dashboard never gets an expressive serif hero), and any `docs/design.md` you point it at is never repeated. The agent picks the candidate the brief leans toward, gives every axis a reason tied to the content, writes `docs/design.md` in the project, and offers the other two as one-liners so you can switch with one word. The report gets a `Design:` line. [`references/design-directions.md`](create-frontend/references/design-directions.md) has the axes, the theme alternates per project type and the template.
+
 ## Motion
 
 Step 7 used to say only what motion may do; now it ships the motion the way it ships colour. [`create-frontend/references/motion.md`](create-frontend/references/motion.md) has:
@@ -267,7 +282,7 @@ When blocked by missing credentials, an unavailable service or tool, or a decisi
 Every run ends with:
 
 ```
-PROJECT            framework, language, styling, theme, motion level, testing, build tool
+PROJECT            framework, language, styling, theme, motion level, design direction, testing, build tool
 IMPLEMENTED        what was built
 VERIFIED           code, types, build, tests, browser, visual, accessibility — each with its result
 NOT VERIFIED       what, why, and the manual command
@@ -288,6 +303,7 @@ Edit `create-frontend/SKILL.md` unless the table says otherwise:
 | Team constraints the skill must respect | Add them to `AGENTS.md` or `CLAUDE.md`; the skill reads them in step 1 and ranks them above its own defaults |
 | Which theme a project type gets | The project → theme table in step 6 |
 | Which motion level a project gets, or a recipe | The level table in step 7; `create-frontend/references/motion.md` |
+| The design axes, theme alternates or coherence rules | `create-frontend/references/design-directions.md`; the `THEMES`, axis lists and `coherent()` in `scripts/design-direction.js` |
 | Add or change a colour theme | `create-frontend/references/themes.md`; run `node create-frontend/scripts/check-contrast.js` on the new values until it exits 0 |
 | Your company's palette as the only theme | Replace the library with one theme derived from your brand and delete the project → theme table |
 | Folder layout | Step 5 |

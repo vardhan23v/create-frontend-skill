@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.3.0 — 2026-10-06
+
+A new design for every prototype.
+
+### Added
+- `references/design-directions.md`: ten design axes (theme and alternates with remix rules, hero archetype, navigation, section rhythm, card character, button shape, type voice and scale, imagery, motion level, density), per-type theme alternates, composition rules and the `docs/design.md` template
+- `scripts/design-direction.js`: composes three coherent, distinct directions seeded by the project name, one on an alternate theme, avoiding any previous `docs/design.md`
+- Step 6 "Design direction": compose, pick with reasons, write `docs/design.md`, offer two alternatives; `Design:` line in the report; definition-of-done item
+- `examples/demo-site/docs/design.md` records the demo's direction
+
+### Changed
+- Step 6 theme choice is now one axis of the direction; the project → theme table gives the primary and the reference gives alternates
+- Frontmatter description describes the direction rather than only the theme
+
 ## 3.2.0 — 2026-10-06
 
 Motion ships like colour does.

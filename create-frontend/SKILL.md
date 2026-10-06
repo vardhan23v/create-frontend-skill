@@ -1,10 +1,10 @@
 ---
 name: "create-frontend"
-description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, picks a named colour theme from a contrast-checked library (or derives one from the brand) and a motion level with paste-ready recipes, builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy."
+description: "Use when asked to create, scaffold, build, extend or fix a frontend (website, landing page, dashboard, web app UI, a page or component) in a new, existing or partially built code project. Classifies the project, decides the stack by priority, draws the frontend/backend boundary, composes a distinct design direction per project (theme from a contrast-checked library or derived from the brand, hero archetype, navigation, rhythm, type voice, imagery, motion level; never the same twice in a workspace), builds (including motion, 3D and icons when wanted), verifies in seven explicit categories and prepares deploy."
 license: "MIT"
 compatibility: "Any Agent Skills client. scripts/ need Node 18+ and a POSIX shell; browser, visual and accessibility checks need a browser tool or Playwright."
 metadata:
-  version: "3.2.0"
+  version: "3.3.0"
   homepage: "https://github.com/vardhan23v/create-frontend-skill"
 ---
 
@@ -147,6 +147,15 @@ Before building more than a screen or two, define the tokens once and use them e
 - **Motion tokens**: three durations (120, 200 and 320 ms), two easings (ease-out for entrances, ease-in for exits) and a travel distance, defined once and collapsed under `prefers-reduced-motion`; the exact block is in `references/motion.md`, and every animation uses them. What may move, and how, is in step 7.
 - **Fonts**: at most two families (the chosen theme names a pairing); `font-display: swap`; self-host or preconnect
 
+### Design direction
+
+A theme is a palette, not a design; two projects of the same type must not come out as one template in two colours. Before the first screen, compose a direction from ten axes (theme and alternates, hero archetype, navigation, section rhythm, card character, button shape, type voice and scale, imagery treatment, motion level, density), defined in `references/design-directions.md`:
+
+1. Run `node <skill directory>/scripts/design-direction.js --type <project type> --name "<project name>" --avoid <every docs/design.md you can find in the workspace>`. It is seeded by the project name, so a second café differs from the first by construction; the three candidates differ on at least four axes, one uses an alternate theme, and none repeats an avoided direction. Without the script, compose three by hand under the same rules.
+2. Pick the candidate the brief and references lean toward (the first when nothing leans); the user may name one instead. Give every axis a reason tied to the content; a choice without a reason is decoration, choose again.
+3. Write `docs/design.md` in the project (template in the reference) and list the two alternatives as one line each in the plan and the report, so the user can switch with one word.
+4. Existing projects keep their established direction; read it from the code and write it down only if the task touches the look.
+
 ### Colour theme
 
 Choose the palette deliberately before the first screen, name it in the plan and the report, and never start from a framework default or the white-page-with-indigo-buttons look. `references/themes.md`, next to this file, holds eleven named themes; each has light and dark token sets, a font pairing, a shape character, ready-to-paste `:root` and `.dark` blocks, and contrast figures produced by `scripts/check-contrast.js`. If this file was installed on its own and `references/` is missing, the appendix at the end of this file has the same tokens in compact form and an inline contrast check.
@@ -155,7 +164,7 @@ Choose the palette deliberately before the first screen, name it in the plan and
 |---|---|
 | Existing project with tokens, a theme file or a component library | Use them; never add a second palette |
 | Brand colours, a logo or a design file supplied | Derive: take the closest theme by temperature and mood, replace `primary` and `ring` with the brand colour (darken it in light mode and lighten it in dark mode until the checker passes), tint the neutrals toward the brand's temperature, keep the rest |
-| Nothing supplied | Pick by project type from the table below. When two fit, prefer the one the user's references lean toward, and say which you chose and why |
+| Nothing supplied | The direction above names it: the project type's primary theme from the table below, or one of its alternates when the primary was used recently in the workspace or the brief leans that way (alternates and remix rules are in `references/design-directions.md`) |
 
 | Project | Theme |
 |---|---|
@@ -411,6 +420,7 @@ Language:
 Styling:
 Theme: (name from references/themes.md, derived from brand, or existing tokens; modes shipped)
 Motion: (minimal | functional | expressive, and which recipes were used)
+Design: (direction chosen: hero, nav, rhythm, cards, buttons, type, imagery; the two alternatives offered; path of docs/design.md)
 Testing:
 Build tool:
 
@@ -449,6 +459,7 @@ DEPLOYMENT NOTES
 
 - [ ] Project classified; existing conventions followed, or the stack choice stated with a reason
 - [ ] Colour theme named (existing tokens, derived from brand, or one from the library); contrast checked in every shipped mode
+- [ ] Design direction composed and written to `docs/design.md`, with reasons, two alternatives offered, and no repeat of a previous direction in the workspace
 - [ ] Motion level named; every animation uses the tokens and honours reduced motion (checked in the browser, not assumed)
 - [ ] Code, types, build and tests pass (pre-existing failures reported, not hidden)
 - [ ] Browser, visual and accessibility checks run, or reported as not available with manual steps
