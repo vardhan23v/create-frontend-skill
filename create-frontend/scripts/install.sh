@@ -16,11 +16,11 @@
 set -eu
 
 here=$(cd "$(dirname "$0")/.." && pwd)        # the create-frontend/ folder
-mode=link; scope=home; targets=''
+mode='link'; scope='home'; targets=''
 for a in "$@"; do
   case "$a" in
-    --copy) mode=copy ;;
-    --project) scope=project ;;
+    --copy) mode='copy' ;;
+    --project) scope='project' ;;
     -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
     *) targets="$targets $a" ;;
   esac
